@@ -9,26 +9,26 @@ export default function(start, filter, sortColumn, ascending, callback) { //call
     if (dableRequest.readyState == 4 && dableRequest.status == 200) {
       var data = JSON.parse(dableRequest.responseText);
       var actualData = data;
-      if (data.rows === undefined) {
+      if (typeof data.rows === 'undefined') {
         actualData = JSON.parse(data.d);
       }
 
       var actualRows = actualData.rows;
-      if (actualRows === undefined) { //need rows in return data
+      if (typeof actualRows === 'undefined') { //need rows in return data
         console.error('Error, no rows in data from source');
         if (callback) {
           return callback('Error, no rows in data from source');
         }
 
         return;
-      } else if (actualData.includedRowCount === undefined) { //need filtered row count in data
+      } else if (typeof actualData.includedRowCount === 'undefined') { //need filtered row count in data
         console.error('Error, no includedRowCount in data from source');
         if (callback) {
           return callback('Error, no includedRowCount in data from source');
         }
 
         return;
-      } else if (actualData.rowCount === undefined) { //need filtered row count in data
+      } else if (typeof actualData.rowCount === 'undefined') { //need filtered row count in data
         console.error('Error, no rowCount in data from source');
         if (callback) {
           return callback('Error, no rowCount in data from source');
@@ -70,7 +70,11 @@ export default function(start, filter, sortColumn, ascending, callback) { //call
   this.asyncStart = start;
   requestObject.count = this.asyncLength;
   requestObject.filter = filter;
-  requestObject.sortColumn = sortColumn === null ? -1 : sortColumn;
+  if (sortColumn === null) {
+    requestObject.sortColumn = -1;
+  } else {
+    requestObject.sortColumn = sortColumn;
+  }
   requestObject.ascending = ascending;
   dableRequest.send(JSON.stringify(requestObject));
 }

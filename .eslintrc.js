@@ -1,3 +1,5 @@
+/* eslint-disable max-lines */
+
 module.exports = {
   parserOptions: {
     ecmaVersion: 6,
@@ -7,13 +9,11 @@ module.exports = {
   env: {
     browser: true,
     node: true,
-    commonjs: true,
-    amd: true,
     qunit: true,
     jquery: true
   },
   globals: {
-    Dable: false,
+    Dable: true,
     sinon: false
   },
   'extends': 'eslint:recommended',
@@ -33,8 +33,8 @@ module.exports = {
     'array-callback-return': ['error'],
     'block-scoped-var': ['error'],
     'class-methods-use-this': ['error'],
-    // 'complexity': ['error', 3],
-    // 'consistent-return': ['error'],
+    complexity: ['error', 12], // 3
+    'consistent-return': ['off'],
     curly: ['error'],
     'default-case': ['error'],
     'dot-location': ['error', 'property'],
@@ -55,7 +55,7 @@ module.exports = {
     'no-implicit-coercion': ['error'],
     'no-implicit-globals': ['error'],
     'no-implied-eval': ['error'],
-    // 'no-invalid-this': ['error'],
+    'no-invalid-this': ['off'],
     'no-iterator': ['error'],
     'no-labels': ['error'],
     'no-lone-blocks': ['error'],
@@ -100,8 +100,8 @@ module.exports = {
     'no-shadow': ['error'],
     'no-shadow-restricted-names': ['error'],
     'no-undef-init': ['error'],
-    // 'no-undefined': ['error'],
-    // 'no-use-before-define': ['error'],
+    'no-undefined': ['error'],
+    'no-use-before-define': ['error'],
 
     /*  Stylistic Issues  */
     'array-bracket-spacing': ['error', 'never'],
@@ -130,43 +130,77 @@ module.exports = {
     'linebreak-style': ['error', 'windows'],
     'lines-around-comment': ['off'],
     'lines-around-directive': ['off'],
-    // 'max-depth': ['error', 3],
+    'max-depth': ['error', 6], // 3 - 4 ?
     'max-len': ['error', {
       code: 80,
       ignoreComments: true,
       ignoreTrailingComments: true,
       ignoreUrls: true
     }],
-    'max-lines': ['off'],
+    'max-lines': ['error', {
+      max: 150,
+      skipBlankLines: true,
+      skipComments: true
+    }],
     'max-nested-callbacks': ['error', 1],
     'max-params': ['error', 5],
-    'max-statements': ['off'],
+    'max-statements': ['error', 53], // 30 ?
     'max-statements-per-line': ['error', {max: 2}],
     'multiline-ternary': ['off'],
-    'new-cap': ['off'],
+    'new-cap': ['error', {
+      capIsNewExceptions: [
+        'ApplyBaseStyles',
+        'ApplyBootstrapStyles',
+        'ApplyJqueryUIStyles',
+        'BuildAll',
+        'BuildFooter',
+        'BuildHeader',
+        'BuildPager',
+        'BuildTable',
+        'CheckForTable',
+        'CreateObjectsFromRows',
+        'CreateRowsFromObjects',
+        'CustomRendering',
+        'CustomSortFunc',
+        'Exists',
+        'GenerateTableFromHtml',
+        'GoToPage',
+        'NextPage',
+        'NumberOfPages',
+        'PreviousPage',
+        'RemoveStyles',
+        'RowCount',
+        'SetColumnNames',
+        'SetDataAsRows',
+        'UpdateDisplayedRows',
+        'UpdateFooter',
+        'UpdateStyle',
+        'VisibleRowCount'
+      ]
+    }],
     'new-parens': ['error'],
     'newline-after-var': ['off'],
     'newline-before-return': ['off'],
-    'newline-per-chained-call': ['error'],
+    'newline-per-chained-call': ['off'],
     'no-array-constructor': ['error'],
     'no-bitwise': ['error'],
-    // 'no-continue': ['error'],
+    'no-continue': ['off'],
     'no-inline-comments': ['off'],
     'no-lonely-if': ['error'],
-    // 'no-mixed-operators': ['error'],
+    'no-mixed-operators': ['off'],
     'no-multi-assign': ['error'],
     'no-multiple-empty-lines': ['error', {
       max: 1,
       maxEOF: 1,
       maxBOF: 1
     }],
-    // 'no-negated-condition': ['error'],
+    'no-negated-condition': ['off'],
     'no-nested-ternary': ['error'],
     'no-new-object': ['error'],
-    // 'no-plusplus': ['error', { 'allowForLoopAfterthoughts': true }],
+    'no-plusplus': ['error', {allowForLoopAfterthoughts: true}],
     'no-restricted-syntax': ['off'],
     'no-tabs': ['error'],
-    // 'no-ternary': ['error'],
+    'no-ternary': ['error'],
     'no-trailing-spaces': ['error'],
     'no-underscore-dangle': ['error'],
     'no-unneeded-ternary': ['error', {defaultAssignment: false}],
@@ -199,9 +233,9 @@ module.exports = {
     'wrap-regex': ['off'],
 
     /*  ECMAScript 6  */
-    'no-duplicate-imports': ['error', { 'includeExports': true }],
+    'no-duplicate-imports': ['error', {includeExports: true}],
     'sort-imports': ['error', {
-      'memberSyntaxSortOrder': [
+      memberSyntaxSortOrder: [
         'none', 'single', 'all', 'multiple'
       ]
     }],

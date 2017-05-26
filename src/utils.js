@@ -1,8 +1,11 @@
 export function mixin(obj, mixins) {
   for (var key in mixins) {
     if (Object.prototype.hasOwnProperty.call(mixins, key)) {
-      obj[key] = typeof mixins[key] === 'object' && mixins[key] !== null ?
-        mixin(mixins[key].constructor(), mixins[key]) : mixins[key];
+      if (typeof mixins[key] === 'object' && mixins[key] !== null) {
+        obj[key] = mixin(mixins[key].constructor(), mixins[key]);
+      } else {
+        obj[key] = mixins[key];
+      }
     }
   }
   return obj;

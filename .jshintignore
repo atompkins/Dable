@@ -1,4 +1,5 @@
 **/*{.,-}min.js
+node_modules/
 ie8
 lib
 **/third_party/**
