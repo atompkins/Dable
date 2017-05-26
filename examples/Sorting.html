@@ -10,12 +10,20 @@
 <body>
 <div id="SortingDable"></div>
 <script type="text/javascript">
+	function indexOf(arr, val) {
+		for (var i = 0; i < arr.length; i += 1) {
+			if (arr[i] === val) {
+				return i;
+			}
+		}
+		return -1;
+	}
 	var dable = new Dable();
 	var data = [
 		[ 1, '12/1/12', 'Armadillo', 'First' ],
 		[ 2, '12/2/2012', 'Cat', 'Fourth' ],
 		[ 3, '1/1/2001', 'Porcupine', 'Second' ],
-		[ 4, '2/22/02', 'Bat', 'Third' ] ];
+		[ 4, '2/22/02', 'bat', 'Third' ] ];
 	var columns = [ 'Numbers', 'Dates', 'Text', 'Custom' ];
 	dable.SetDataAsRows(data);
 	dable.SetColumnNames(columns);
@@ -24,7 +32,8 @@
 		currentRowObjects.sort(function(a, b) {
 			var valueA = a.Row[columnIndex];
 			var valueB = b.Row[columnIndex];
-			return order.indexOf(valueA) - order.indexOf(valueB);
+			// return order.indexOf(valueA) - order.indexOf(valueB);
+			return indexOf(order, valueA) - indexOf(order, valueB);
 		});
 		
 		if (!ascending) {
