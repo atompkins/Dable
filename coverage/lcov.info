@@ -1,5 +1,5 @@
 TN:
-SF:E:\GitHub\Dable\src\addRow.js
+SF:/home/ubuntu/workspace/src/addRow.js
 FN:3,(anonymous_1)
 FNF:1
 FNH:0
@@ -20,7 +20,7 @@ BRF:2
 BRH:0
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\applyBaseStyles.js
+SF:/home/ubuntu/workspace/src/applyBaseStyles.js
 FN:1,(anonymous_1)
 FN:38,(anonymous_2)
 FN:41,(anonymous_3)
@@ -101,7 +101,7 @@ BRF:10
 BRH:6
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\applyBootstrapStyles.js
+SF:/home/ubuntu/workspace/src/applyBootstrapStyles.js
 FN:3,(anonymous_1)
 FNF:1
 FNH:1
@@ -177,7 +177,7 @@ BRF:10
 BRH:5
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\applyJqueryUIStyles.js
+SF:/home/ubuntu/workspace/src/applyJqueryUIStyles.js
 FN:3,(anonymous_1)
 FNF:1
 FNH:0
@@ -252,7 +252,7 @@ BRF:14
 BRH:0
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\asyncReload.js
+SF:/home/ubuntu/workspace/src/asyncReload.js
 FN:3,(anonymous_1)
 FN:5,(anonymous_2)
 FNF:2
@@ -284,7 +284,7 @@ BRF:8
 BRH:0
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\asyncRequest.js
+SF:/home/ubuntu/workspace/src/asyncRequest.js
 FN:1,(anonymous_1)
 FN:8,(anonymous_2)
 FN:54,(anonymous_3)
@@ -381,7 +381,7 @@ BRF:29
 BRH:0
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\baseSort.js
+SF:/home/ubuntu/workspace/src/baseSort.js
 FN:7,ifDate
 FN:17,detectDate
 FN:27,testCellContents
@@ -497,7 +497,7 @@ BRF:25
 BRH:9
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\buildAll.js
+SF:/home/ubuntu/workspace/src/buildAll.js
 FN:3,(anonymous_1)
 FN:15,(anonymous_2)
 FNF:2
@@ -544,7 +544,7 @@ BRF:8
 BRH:4
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\buildFooter.js
+SF:/home/ubuntu/workspace/src/buildFooter.js
 FN:1,(anonymous_1)
 FNF:1
 FNH:1
@@ -575,7 +575,7 @@ BRF:2
 BRH:1
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\buildHeader.js
+SF:/home/ubuntu/workspace/src/buildHeader.js
 FN:3,(anonymous_1)
 FN:26,(anonymous_2)
 FNF:2
@@ -638,7 +638,7 @@ BRF:4
 BRH:3
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\buildPager.js
+SF:/home/ubuntu/workspace/src/buildPager.js
 FN:7,makePageFirst
 FN:24,makePageLeft
 FN:41,makePageRight
@@ -761,7 +761,7 @@ BRF:22
 BRH:7
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\buildTable.js
+SF:/home/ubuntu/workspace/src/buildTable.js
 FN:3,(anonymous_1)
 FNF:1
 FNH:1
@@ -815,7 +815,7 @@ BRF:6
 BRH:4
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\checkForTable.js
+SF:/home/ubuntu/workspace/src/checkForTable.js
 FN:1,(anonymous_1)
 FNF:1
 FNH:1
@@ -873,7 +873,7 @@ BRF:24
 BRH:17
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\dable.js
+SF:/home/ubuntu/workspace/src/dable.js
 FN:36,(anonymous_1)
 FN:39,Dable
 FN:46,(anonymous_3)
@@ -970,7 +970,7 @@ BRF:4
 BRH:3
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\defaults.js
+SF:/home/ubuntu/workspace/src/defaults.js
 FNF:0
 FNH:0
 LF:0
@@ -979,7 +979,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\deleteRow.js
+SF:/home/ubuntu/workspace/src/deleteRow.js
 FN:3,(anonymous_1)
 FNF:1
 FNH:0
@@ -1005,7 +1005,7 @@ BRF:4
 BRH:0
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\exists.js
+SF:/home/ubuntu/workspace/src/exists.js
 FN:1,(anonymous_1)
 FNF:1
 FNH:1
@@ -1049,7 +1049,7 @@ BRF:17
 BRH:3
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\filters.js
+SF:/home/ubuntu/workspace/src/filters.js
 FN:3,(anonymous_1)
 FN:25,(anonymous_2)
 FNF:2
@@ -1096,7 +1096,7 @@ BRF:6
 BRH:3
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\generateTableFromHtml.js
+SF:/home/ubuntu/workspace/src/generateTableFromHtml.js
 FN:1,(anonymous_1)
 FNF:1
 FNH:1
@@ -1152,7 +1152,7 @@ BRF:13
 BRH:8
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\goToPage.js
+SF:/home/ubuntu/workspace/src/goToPage.js
 FN:3,(anonymous_1)
 FN:17,(anonymous_2)
 FNF:2
@@ -1189,7 +1189,7 @@ BRF:11
 BRH:2
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\lastPage.js
+SF:/home/ubuntu/workspace/src/lastPage.js
 FN:3,(anonymous_1)
 FN:24,(anonymous_2)
 FNF:2
@@ -1231,7 +1231,7 @@ BRF:13
 BRH:0
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\removeStyles.js
+SF:/home/ubuntu/workspace/src/removeStyles.js
 FN:3,(anonymous_1)
 FNF:1
 FNH:1
@@ -1285,7 +1285,7 @@ BRF:4
 BRH:4
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\searchFunc.js
+SF:/home/ubuntu/workspace/src/searchFunc.js
 FN:3,(anonymous_1)
 FN:22,(anonymous_2)
 FNF:2
@@ -1353,7 +1353,7 @@ BRF:20
 BRH:9
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\setColumnNames.js
+SF:/home/ubuntu/workspace/src/setColumnNames.js
 FN:1,(anonymous_1)
 FNF:1
 FNH:1
@@ -1375,7 +1375,7 @@ BRF:4
 BRH:2
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\setDataAsColumns.js
+SF:/home/ubuntu/workspace/src/setDataAsColumns.js
 FN:1,(anonymous_1)
 FNF:1
 FNH:0
@@ -1402,7 +1402,7 @@ BRF:2
 BRH:0
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\setDataAsRows.js
+SF:/home/ubuntu/workspace/src/setDataAsRows.js
 FN:1,(anonymous_1)
 FNF:1
 FNH:1
@@ -1429,7 +1429,7 @@ BRF:2
 BRH:1
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\sortFunc.js
+SF:/home/ubuntu/workspace/src/sortFunc.js
 FN:3,(anonymous_1)
 FN:39,(anonymous_2)
 FNF:2
@@ -1500,7 +1500,7 @@ BRF:22
 BRH:16
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\updateDisplayedRows.js
+SF:/home/ubuntu/workspace/src/updateDisplayedRows.js
 FN:1,(anonymous_1)
 FNF:1
 FNH:1
@@ -1561,7 +1561,7 @@ BRF:14
 BRH:11
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\updateFooter.js
+SF:/home/ubuntu/workspace/src/updateFooter.js
 FN:1,(anonymous_1)
 FNF:1
 FNH:1
@@ -1603,7 +1603,7 @@ BRF:12
 BRH:9
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\updateStyle.js
+SF:/home/ubuntu/workspace/src/updateStyle.js
 FN:1,(anonymous_1)
 FNF:1
 FNH:1
@@ -1645,7 +1645,7 @@ BRF:14
 BRH:10
 end_of_record
 TN:
-SF:E:\GitHub\Dable\src\utils.js
+SF:/home/ubuntu/workspace/src/utils.js
 FN:1,mixin
 FN:14,bind
 FN:16,(anonymous_3)
