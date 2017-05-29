@@ -1,5 +1,7 @@
 **/*{.,-}min.js
-node_modules/
+coverage/lcov-report/**
+coverage/dable.test.js
 ie8
 lib
+node_modules/
 **/third_party/**
