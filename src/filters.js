@@ -6,7 +6,8 @@ export default [
     var phrases = [];
     var regex = /\s*".*?"\s*/g;
     var match;
-    while ((match = regex.exec(searchText))) {
+    // eslint-disable-next-line no-cond-assign
+    while (match = regex.exec(searchText)) { // jshint ignore:line
       var phrase = match[0].replace(/"/g, '').trim();
       phrases.push(phrase);
       searchText = searchText.replace(match[0], ' ');
@@ -26,14 +27,15 @@ export default [
     value = value.toString().toLowerCase();
     var regex = /\s*".*?"\s*/g;
     var match;
-    while ((match = regex.exec(searchText))) {
+    // eslint-disable-next-line no-cond-assign
+    while (match = regex.exec(searchText)) { // jshint ignore:line
       searchText = searchText.replace(match[0], ' ');
     } //remove phrases
     var splitText = searchText.split(' ');
     for (var i = 0; i < splitText.length; ++i) {
       if (!splitText[i]) { //clear out empty strings
         splitText.splice(i, 1);
-        --i;
+        i -= 1;
       }
     }
 

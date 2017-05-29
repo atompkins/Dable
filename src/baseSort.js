@@ -1,79 +1,93 @@
-export default function(columnIndex, ascending, currentRowObjects) {
-  var isInt = true;
-  var isDate = true;
-  var newRowObjects = currentRowObjects.slice(0);
-  for (var i = 0; i < currentRowObjects.length; ++i) {
-    //simple 2/21/2010 style dates parse cleanly to int, so we can drop out
-    //if this won't parse
-    if (parseInt(currentRowObjects[i].Row[columnIndex], 10).toString()
-        .toLowerCase() == 'nan') {
-      isInt = false;
-    }
-    //check for dates
-    var dateString = currentRowObjects[i].Row[columnIndex].toString();
-    var splitDate = dateString.split('/');
-    if (splitDate.length != 3 ||
-        (splitDate[0].length < 1 || splitDate[0].length > 2) ||
-        (splitDate[1].length < 1 || splitDate[1].length > 2) ||
-        splitDate[2].length != 2 && splitDate[2].length != 4) {
-      isDate = false;
-    }
-  }
+var splitDateRe = /^(\d{1,2})[/-](\d{1,2})[/-](\d{2}(?:\d{2})?)$/;
+var direction;
+var isInt;
+var isDate;
+var newRowObjects;
 
-  if (isDate) {
-    newRowObjects = newRowObjects.sort(function(a, b) {
-      //default to US Date schema
-      var splitDateA = a.Row[columnIndex].split('/');
-      var yearA = splitDateA[2].toString();
-      var monthA = splitDateA[0].toString();
-      var dayA = splitDateA[1].toString();
-      if (yearA.length == 2) {
-        yearA = '20' + yearA;
-        //don't guess, let them use 4 digits if they want 19xx
-      }
-      if (monthA.length == 1) {
-        monthA = '0' + monthA;
-      }
-      if (dayA.length == 1) {
-        dayA = '0' + dayA;
-      }
-      var yearMonthDayA = yearA + monthA + dayA;
-      var splitDateB = b.Row[columnIndex].split('/');
-      var yearB = splitDateB[2].toString();
-      var monthB = splitDateB[0].toString();
-      var dayB = splitDateB[1].toString();
-      if (yearB.length == 2) {
-        yearB = '20' + yearB;
-        //don't guess, let them use 4 digits if they want 19xx
-      }
-      if (monthB.length == 1) {
-        monthB = '0' + monthB;
-      }
-      if (dayB.length == 1) {
-        dayB = '0' + dayB;
-      }
-      var yearMonthDayB = yearB + monthB + dayB;
-      return parseInt(yearMonthDayA, 10) - parseInt(yearMonthDayB, 10);
-    });
-  } else if (isInt) {
-    newRowObjects = newRowObjects.sort(function(a, b) {
-      return parseInt(a.Row[columnIndex], 10) -
-        parseInt(b.Row[columnIndex], 10);
-    });
+function ifDate(val) {
+  var datePartArray = splitDateRe.exec(val);
+  if (datePartArray) {
+    var month = ('0' + datePartArray[1]).slice(-2);
+    var day = ('0' + datePartArray[2]).slice(-2);
+    var year = ('20' + datePartArray[3]).slice(-4);
+    return year + month + day;
+  }
+}
+
+function detectDate(value, i) {
+  isInt = false;
+  var maybeDate = ifDate(value);
+  if (maybeDate) {
+    newRowObjects.push({index: i, sortkey: maybeDate});
   } else {
-    newRowObjects = newRowObjects.sort(function(a, b) {
-      if (a.Row[columnIndex] > b.Row[columnIndex]) {
-        return 1;
-      } else if (a.Row[columnIndex] < b.Row[columnIndex]) {
-        return -1;
-      }
-      return 0;
-    });
+    isDate = false;
+  }
+}
+
+function testCellContents(value, i) {
+  var maybeInt = parseInt(value, 10);
+  if (maybeInt.toString().toLowerCase() === 'nan') {
+    isInt = false;
+    isDate = false;
+  } else if (value === maybeInt.toString()) {
+    isDate = false;
+    newRowObjects.push({index: i, sortkey: maybeInt});
+  } else {
+    detectDate(value, i);
+  }
+}
+
+function detectColumnType(columnIndex, currentRowObjects) {
+  var i = 0;
+  while ((isInt || isDate) && i < currentRowObjects.length) {
+    testCellContents(currentRowObjects[i].Row[columnIndex].toString(), i);
+    i += 1;
+  }
+}
+
+function lexSort(columnIndex, currentRowObjects) {
+  return currentRowObjects.sort(function(a, b) {
+    if (a.Row[columnIndex] > b.Row[columnIndex]) {
+      return direction;
+    } else if (a.Row[columnIndex] < b.Row[columnIndex]) {
+      return -direction;
+    }
+    return 0;
+  });
+}
+
+function hydrate(currentRowObjects) {
+  var res = [];
+  for (var i = 0; i < newRowObjects.length; i++) {
+    res.push(currentRowObjects[newRowObjects[i].index]);
+  }
+  return res;
+}
+
+function schwTrans(currentRowObjects) {
+  newRowObjects.sort(function(a, b) {
+    if (a.sortkey > b.sortkey) {
+      return direction;
+    } else if (a.sortkey < b.sortkey) {
+      return -direction;
+    }
+    return 0;
+  });
+  return hydrate(currentRowObjects);
+}
+
+export default function(columnIndex, ascending, currentRowObjects) {
+  isInt = true;
+  isDate = true;
+  newRowObjects = [];
+  detectColumnType(columnIndex, currentRowObjects);
+
+  direction = -1;
+  if (ascending) {direction = 1;}
+
+  if (!isInt && !isDate) {
+    return lexSort(columnIndex, currentRowObjects);
   }
 
-  if (!ascending) {
-    newRowObjects = newRowObjects.reverse();
-  }
-
-  return newRowObjects;
+  return schwTrans(currentRowObjects);
 }

@@ -1,3 +1,5 @@
+/* eslint-disable max-lines, max-statements*/
+/* jshint -W071 */
 
 // From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
 if (!Object.keys) {
@@ -251,7 +253,8 @@ test('Dable with style="none" has basic elements', function() {
   makeSimpleTable(testDiv);
 
   //When: we make it a dable
-  var dable = new Dable(testDiv.id); // eslint-disable-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars
+  var dable = new Dable(testDiv.id); // jshint ignore:line
 
   //Then: we see the elements we expect
   //Element pattern
@@ -976,7 +979,8 @@ test('basic Dable from nested HTML looks right', function() {
   var innerDiv = makeNestedTable(testDiv);
 
   //When: we make it a dable
-  var dable = new Dable(innerDiv); // eslint-disable-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars
+  var dable = new Dable(innerDiv); // jshint ignore:line
 
   //Then: we see the elements we expect
   //Element pattern
@@ -997,7 +1001,8 @@ test('basic Dable ascending sort', function() {
   makeSimpleTable(testDiv);
 
   //When: we make it a dable and click on a header
-  var dable = new Dable(testDiv); // eslint-disable-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars
+  var dable = new Dable(testDiv); // jshint ignore:line
   var table = testDiv.querySelector('table');
   table.children[0].children[0].children[0].children[0].click();
 
@@ -1011,7 +1016,8 @@ test('basic Dable decending sort', function() {
   makeSimpleTable(testDiv);
 
   //When: we make it a dable and click on a header
-  var dable = new Dable(testDiv); // eslint-disable-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars
+  var dable = new Dable(testDiv); // jshint ignore:line
   var table = testDiv.querySelector('table');
   table.children[0].children[0].children[0].children[0].click();
   table.children[0].children[0].children[0].children[0].click();
@@ -1026,7 +1032,8 @@ test('basic Dable search filter', function() {
   makeSimpleTable(testDiv);
 
   //When: we make it a dable and click on a header
-  var dable = new Dable(testDiv); // eslint-disable-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars
+  var dable = new Dable(testDiv); // jshint ignore:line
   var table = testDiv.querySelector('table');
   var search = testDiv.children[0].children[1].children[1];
   search.value = '11';

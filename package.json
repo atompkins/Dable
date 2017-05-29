@@ -7,15 +7,25 @@
   "main": "Dable.js",
   "scripts": {
     "clean": "rimraf lib/*",
-    "prebuild": "npm run eslint && npm run clean",
+    "precover": "npm run instrument",
+    "cover": "node ./coverage/cover.js",
+    "postcover": "istanbul report --root ./coverage/ text-summary",
+    "prebuild": "npm run clean",
     "build": "npm run rollup",
-    "postbuild": "npm run uglify && npm run qunit",
+    "postbuild": "npm run uglify",
     "eslint": "eslint .",
+    "instrument": "rollup -c --environment BUILD:test",
+    "jshint": "jshint . --verbose",
+    "jsinspect": "jsinspect ./src",
+    "lcov": "istanbul report --root ./coverage/ lcovonly",
+    "lint": "npm run jshint && npm run eslint",
     "qunit": "node-qunit-phantomjs test/test.html",
+    "report": "istanbul report --root ./coverage/ lcov",
     "rollup": "rollup -c",
+    "pretest": "npm run lint",
     "test": "npm run build",
-    "uglify": "npm run uglify:umd",
-    "uglify:umd": "uglifyjs ./lib/dable.js -c -m -b -o ./lib/dable.min.js --comments /^!/ --ie8 --toplevel"
+    "posttest": "npm run qunit",
+    "uglify": "uglifyjs ./lib/dable.js -c -m -o ./lib/dable.min.js --comments /^!/ --ie8 --toplevel"
   },
   "repository": {
     "type": "git",
@@ -27,11 +37,16 @@
   },
   "devDependencies": {
     "bower": "^1.8.0",
+    "codeclimate-test-reporter": "^0.4.1",
     "eslint": "^3.19.0",
+    "istanbul": "^0.4.5",
+    "jshint": "^2.9.4",
+    "jsinspect": "^0.12.4",
     "node-qunit-phantomjs": "^1.5.0",
     "qunitjs": "^1.23.1",
     "rimraf": "^2.6.1",
     "rollup": "^0.41.6",
+    "rollup-plugin-istanbul": "^1.1.0",
     "uglify-js": "^3.0.7"
   }
 }

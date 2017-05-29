@@ -8,9 +8,9 @@ export default function(tableDiv) {
   var showing = span.cloneNode(false);
   showing.id = this.id + '_showing';
   left.appendChild(showing);
-  var right = this.BuildPager(footer);
   var clear = div.cloneNode(false);
   var footer = div.cloneNode(false);
+  var right = this.BuildPager(footer);
   footer.id = this.id + '_footer';
   footer.innerHTML = '';
   footer.appendChild(left);

@@ -20,5 +20,6 @@ ratings:
   - "**.py"
   - "**.rb"
 exclude_paths:
+- "coverage/"
 - "lib/"
 - "test/"
