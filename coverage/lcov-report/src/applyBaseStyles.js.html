@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for src\applyBaseStyles.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">src/</a> applyBaseStyles.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">89.29% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>50/56</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">60% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>6/10</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">33.33% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>1/3</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">89.29% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>50/56</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">133×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">133×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">1060×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">106×</span>
+<span class="cline-any cline-yes">106×</span>
+<span class="cline-any cline-yes">106×</span>
+<span class="cline-any cline-yes">106×</span>
+<span class="cline-any cline-yes">104×</span>
+<span class="cline-any cline-yes">104×</span>
+<span class="cline-any cline-yes">104×</span>
+<span class="cline-any cline-yes">104×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">104×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">104×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">54×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export default function(tableDiv) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (this.dableClass) {
+<span class="cstat-no" title="statement not covered" >    tableDiv.setAttribute('class', this.dableClass);</span>
+  }
+&nbsp;
+  var table = tableDiv.querySelector('table');
+  table.setAttribute('style', 'width: 100%;');
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (this.tableClass) {
+<span class="cstat-no" title="statement not covered" >    table.setAttribute('class', this.tableClass);</span>
+  }
+&nbsp;
+  var oddRows = tableDiv.querySelectorAll('.' + this.oddRowClass);
+  for (var i = 0; i &lt; oddRows.length; ++i) {
+    oddRows[i].setAttribute('style', 'background-color: ' + this.oddRowColor);
+  }
+&nbsp;
+  var evenRows = tableDiv.querySelectorAll('.' + this.evenRowClass);
+  for (var j = 0; j &lt; evenRows.length; ++j) {
+    evenRows[j].setAttribute('style', 'background-color: ' + this.evenRowColor);
+  }
+  var cells = tableDiv.querySelectorAll('tbody td');
+  for (var k = 0; k &lt; cells.length; ++k) {
+    cells[k].setAttribute('style', 'padding: 5px;');
+  }
+&nbsp;
+  var headCellClear;
+  var headCells = tableDiv.querySelectorAll('th');
+  for (var l = 0; l &lt; headCells.length; ++l) {
+    headCells[l].setAttribute('style', 'padding: 5px;');
+    var headCellLeft = headCells[l].children[0];
+    headCellLeft.setAttribute('style', 'float: left');
+    if (this.columnData[l].CustomSortFunc !== false) {
+      var headCellRight = headCells[l].children[1];
+      headCellRight.setAttribute('style', 'float: right');
+      headCellClear = headCells[l].children[2];
+      headCellClear.setAttribute('style', 'clear: both;');
+&nbsp;
+      headCells[l].onmouseover = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >        this.setAttribute('style', 'padding: 5px; cursor: pointer');</span>
+      };
+      headCells[l].onmouseout = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >        this.setAttribute('style', 'padding: 5px; cursor: default');</span>
+      };
+    } else {
+      headCellClear = headCells[l].children[1];
+      headCellClear.setAttribute('style', 'clear: both;');
+    }
+  }
+&nbsp;
+  var header = tableDiv.querySelector('#' + this.id + '_header');
+  header.setAttribute('style', 'padding: 5px;');
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (this.headerClass) {
+<span class="cstat-no" title="statement not covered" >    header.setAttribute('class', this.headerClass);</span>
+  }
+&nbsp;
+  var headLeft = header.children[0];
+  headLeft.setAttribute('style', 'float: left;');
+  var headRight = header.children[1];
+  headRight.setAttribute('style', 'float: right;');
+  var headClear = header.children[2];
+  headClear.setAttribute('style', 'clear: both;');
+&nbsp;
+  var footer = tableDiv.querySelector('#' + this.id + '_footer');
+  footer.setAttribute('style', 'padding: 5px;');
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (this.footerClass) {
+<span class="cstat-no" title="statement not covered" >    footer.setAttribute('class', this.footerClass);</span>
+  }
+&nbsp;
+  var footLeft = footer.children[0];
+  footLeft.setAttribute('style', 'float: left;');
+  var footClear = footer.children[2];
+  footClear.setAttribute('style', 'clear: both;');
+  var footRight = footer.children[1];
+  footRight.setAttribute('style', 'float: right; list-style: none;');
+  var footRightItems = footRight.querySelectorAll('li');
+  for (var m = 0; m &lt; footRightItems.length; ++m) {
+    footRightItems[m].setAttribute('style',
+      'display: inline; margin-right: 5px;');
+  }
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon May 29 2017 20:13:51 GMT+0100 (GMT Summer Time)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>
