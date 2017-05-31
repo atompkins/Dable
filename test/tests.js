@@ -1,4 +1,4 @@
-/* eslint-disable max-lines, max-statements*/
+/* eslint-disable max-lines, max-statements, no-global-assign*/
 /* jshint -W071 */
 
 // From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
@@ -96,7 +96,7 @@ function hex(x) {
 }
 
 function rgb2hex(rgb) {
-  if (rgb.search('rgb') === -1) {return rgb;}
+  if (rgb.indexOf('rgb') === -1) {return rgb;}
   var res = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?\)$/);
   return '#' + hex(res[1]) + hex(res[2]) + hex(res[3]);
 }
@@ -120,16 +120,58 @@ function floatStyle(el) {
   return el.styleFloat || el.cssFloat;
 }
 
+function indexOf(arr, val) {
+  for (var i = 0; i < arr.length; i += 1) {
+    if (arr[i] === val) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function customSortFn(columnIndex, ascending, currentRowObjects) {
+  var order = ['First', 'Second', 'Third', 'Fourth'];
+  currentRowObjects.sort(function(a, b) {
+    var valueA = a.Row[columnIndex];
+    var valueB = b.Row[columnIndex];
+    return indexOf(order, valueA) - indexOf(order, valueB);
+  });
+
+  if (!ascending) {
+    currentRowObjects.reverse();
+  }
+
+  return currentRowObjects;
+}
+
+function makeCustomDable(testDiv) {
+  var dable = new Dable();
+  var data = [
+    [1, '12/1/12', 'Porcupine', 'Second'],
+    [2, '12/2/2012', 'Cat', 'Fourth'],
+    [3, '1/1/2001', 'bat', 'First'],
+    [4, '2/22/02', 'Zebra', 'Third']
+  ];
+  var columns = ['Numbers', 'Dates', 'Text', 'Custom'];
+  dable.SetDataAsRows(data);
+  dable.SetColumnNames(columns);
+  dable.columnData[3].CustomSortFunc = customSortFn;
+  dable.BuildAll(testDiv);
+}
+
+var consoleOutput;
+if (!console) {console = {};}
+console.error = function() {
+  consoleOutput = arguments[0];
+};
+
 var testDiv = document.getElementById('qunit-fixture');
 module('Baseline Tests');
 test('Dable exists', function() {
   //Given: Nothing
-
   //When: We check the type of Dable
-  var result = typeof Dable;
-
   //Then: Dable's type is a function
-  ok(result === 'function', 'Dable is a function');
+  strictEqual(typeof Dable, 'function', 'Dable is a function');
 });
 test('Dable defaults are empty, not null', function() {
   //Given: Nothing
@@ -138,83 +180,93 @@ test('Dable defaults are empty, not null', function() {
   var dable = new Dable();
 
   //Then: It's defaults are empty, not null
-  ok(dable !== null, 'Dable is not null');
-  ok(dable.id !== null, 'ID is not null');
-  ok(dable.id === '', 'ID is empty');
-  ok(dable.columns !== null, 'Columns is not null');
+  notStrictEqual(dable, null, 'Dable is not null');
+  notStrictEqual(dable.id, null, 'ID is not null');
+  strictEqual(dable.id, '', 'ID is empty');
+  notStrictEqual(dable.columns, null, 'Columns is not null');
   ok(dable.columns instanceof Array, 'Columns is an Array');
-  ok(dable.columns.length === 0, 'Columns is empty');
-  ok(dable.columnData !== null, 'ColumnData is not null');
+  strictEqual(dable.columns.length, 0, 'Columns is empty');
+  notStrictEqual(dable.columnData, null, 'ColumnData is not null');
   ok(dable.columnData instanceof Array, 'ColumnData is an Array');
-  ok(dable.columnData.length === 0, 'ColumnData is empty');
-  ok(dable.rows !== null, 'Rows is not null');
+  strictEqual(dable.columnData.length, 0, 'ColumnData is empty');
+  notStrictEqual(dable.rows, null, 'Rows is not null');
   ok(dable.rows instanceof Array, 'Rows is an Array');
-  ok(dable.rows.length === 0, 'Rows is empty');
-  ok(dable.rowObjects !== null, 'RowObjects is not null');
+  strictEqual(dable.rows.length, 0, 'Rows is empty');
+  notStrictEqual(dable.rowObjects, null, 'RowObjects is not null');
   ok(dable.rowObjects instanceof Array, 'RowObjects is an Array');
-  ok(dable.rowObjects.length === 0, 'RowObjects is empty');
-  ok(dable.hiddenColumns !== null, 'HiddenColumns is not null');
+  strictEqual(dable.rowObjects.length, 0, 'RowObjects is empty');
+  notStrictEqual(dable.hiddenColumns, null, 'HiddenColumns is not null');
   ok(dable.hiddenColumns instanceof Array, 'HiddenColumns is an Array');
-  ok(dable.hiddenColumns.length === 0, 'HiddenColumns is empty');
-  ok(dable.filters !== null, 'Filters is not null');
+  strictEqual(dable.hiddenColumns.length, 0, 'HiddenColumns is empty');
+  notStrictEqual(dable.filters, null, 'Filters is not null');
   ok(dable.filters instanceof Array, 'Filters is an Array');
-  ok(dable.filters.length === 2, 'Filters contains the 2 default filters');
-  ok(dable.pageSizes !== null, 'PageSizes is not null');
+  strictEqual(dable.filters.length, 2,
+    'Filters contains the 2 default filters');
+  notStrictEqual(dable.pageSizes, null, 'PageSizes is not null');
   ok(dable.pageSizes instanceof Array, 'PageSizes is an Array');
-  ok(dable.pageSizes.length === 4, 'PageSizes contains the 2 default filters');
-  ok(dable.async !== null, 'Async is not null');
-  ok(dable.async === false, 'Async is false');
-  ok(dable.asyncData !== null, 'AsyncData is not null');
+  strictEqual(dable.pageSizes.length, 4,
+    'PageSizes contains the 4 default page sizes');
+  notStrictEqual(dable.async, null, 'Async is not null');
+  strictEqual(dable.async, false, 'Async is false');
+  notStrictEqual(dable.asyncData, null, 'AsyncData is not null');
   ok(dable.asyncData instanceof Object, 'AsyncData is an object');
-  ok(Object.keys(dable.asyncData).length === 0, 'AsyncData has no properties');
-  ok(dable.asyncLength !== null, 'AsyncLength is not null');
-  ok(dable.asyncLength === 1000, 'AsyncLength is the default: 1000');
-  ok(dable.asyncStart !== null, 'AsyncStart is not null');
-  ok(dable.asyncStart === 0, 'AsyncStart is the default: 0');
-  ok(dable.currentFilter !== null, 'CurrentFilter is not null');
-  ok(dable.currentFilter === '', 'CurrentFilter is empty');
-  ok(dable.dableClass !== null, 'DableClass is not null');
-  ok(dable.dableClass === '', 'DableClass is empty');
-  ok(dable.evenRowColor !== null, 'EvenRowColor is not null');
-  ok(dable.evenRowColor === '#E2E4FF', 'EvenRowColor is the default: #E2E4FF');
-  ok(dable.evenRowClass !== null, 'EvenRowClass is not null');
-  ok(dable.evenRowClass === 'table-row-even',
+  strictEqual(Object.keys(dable.asyncData).length, 0,
+    'AsyncData has no properties');
+  notStrictEqual(dable.asyncLength, null, 'AsyncLength is not null');
+  strictEqual(dable.asyncLength, 1000, 'AsyncLength is the default: 1000');
+  notStrictEqual(dable.asyncStart, null, 'AsyncStart is not null');
+  strictEqual(dable.asyncStart, 0, 'AsyncStart is the default: 0');
+  notStrictEqual(dable.currentFilter, null, 'CurrentFilter is not null');
+  strictEqual(dable.currentFilter, '', 'CurrentFilter is empty');
+  notStrictEqual(dable.dableClass, null, 'DableClass is not null');
+  strictEqual(dable.dableClass, '', 'DableClass is empty');
+  notStrictEqual(dable.evenRowColor, null, 'EvenRowColor is not null');
+  strictEqual(dable.evenRowColor, '#E2E4FF',
+    'EvenRowColor is the default: #E2E4FF');
+  notStrictEqual(dable.evenRowClass, null, 'EvenRowClass is not null');
+  strictEqual(dable.evenRowClass, 'table-row-even',
     'EvenRowClass is the default: table-row-even');
-  ok(dable.footerClass !== null, 'FooterClass is not null');
-  ok(dable.footerClass === '', 'FooterClass is empty');
-  ok(dable.headerClass !== null, 'HeaderClass is not null');
-  ok(dable.headerClass === '', 'HeaderClass is empty');
-  ok(dable.oddRowColor !== null, 'OddRowColor is not null');
-  ok(dable.oddRowColor === 'white', 'OddRowColor is the default: #E2E4FF');
-  ok(dable.oddRowClass !== null, 'OddRowClass is not null');
-  ok(dable.oddRowClass === 'table-row-odd',
+  notStrictEqual(dable.footerClass, null, 'FooterClass is not null');
+  strictEqual(dable.footerClass, '', 'FooterClass is empty');
+  notStrictEqual(dable.headerClass, null, 'HeaderClass is not null');
+  strictEqual(dable.headerClass, '', 'HeaderClass is empty');
+  notStrictEqual(dable.oddRowColor, null, 'OddRowColor is not null');
+  strictEqual(dable.oddRowColor, 'white',
+    'OddRowColor is the default: #E2E4FF');
+  notStrictEqual(dable.oddRowClass, null, 'OddRowClass is not null');
+  strictEqual(dable.oddRowClass, 'table-row-odd',
     'OddRowClass is the default: table-row-odd');
-  ok(dable.pageNumber !== null, 'PageNumber is not null');
-  ok(dable.pageNumber === 0, 'PageNumber is the default: 0');
-  ok(dable.pageSize !== null, 'PageSize is not null');
-  ok(dable.pageSize === 10, 'PageSize is the default: 10');
-  ok(dable.minimumSearchLength !== null, 'MinimumSearchLength is not null');
-  ok(dable.minimumSearchLength === 1, 'MinimumSearchLength is the default: 1');
-  ok(dable.pagerButtonsClass !== null, 'PagerButtonsClass is not null');
-  ok(dable.pagerButtonsClass === 'table-page',
+  notStrictEqual(dable.pageNumber, null, 'PageNumber is not null');
+  strictEqual(dable.pageNumber, 0, 'PageNumber is the default: 0');
+  notStrictEqual(dable.pageSize, null, 'PageSize is not null');
+  strictEqual(dable.pageSize, 10, 'PageSize is the default: 10');
+  notStrictEqual(dable.minimumSearchLength, null,
+    'MinimumSearchLength is not null');
+  strictEqual(dable.minimumSearchLength, 1,
+    'MinimumSearchLength is the default: 1');
+  notStrictEqual(dable.pagerButtonsClass, null,
+    'PagerButtonsClass is not null');
+  strictEqual(dable.pagerButtonsClass, 'table-page',
     'PagerButtonsClass is the default: table-page');
-  ok(dable.pagerIncludeFirstAndLast !== null,
+  notStrictEqual(dable.pagerIncludeFirstAndLast, null,
     'PagerIncludeFirstAndLast is not null');
-  ok(dable.pagerIncludeFirstAndLast === false,
+  strictEqual(dable.pagerIncludeFirstAndLast, false,
     'PagerIncludeFirstAndLast is the default: false');
-  ok(dable.pagerSize !== null, 'PagerSize is not null');
-  ok(dable.pagerSize === 0, 'PagerSize is the default: 0');
-  ok(dable.sortClass !== null, 'SortClass is not null');
-  ok(dable.sortClass === 'table-sort', 'SortClass is the default: table-sort');
-  ok(dable.sortColumn === null, 'SortColumn is null');
-  ok(dable.sortOrder !== null, 'SortOrder is not null');
-  ok(dable.sortOrder === 'descending', 'SortOrder is the default: descending');
-  ok(dable.style !== null, 'Style is not null');
-  ok(dable.style === 'none', 'Style is the default: none');
-  ok(dable.tableClass !== null, 'TableClass is not null');
-  ok(dable.tableClass === '', 'TableClass is empty');
-  ok(dable.tfoothtml !== null, 'TFootHtml is not null');
-  ok(dable.tfoothtml === '', 'TFootHtml is empty');
+  notStrictEqual(dable.pagerSize, null, 'PagerSize is not null');
+  strictEqual(dable.pagerSize, 0, 'PagerSize is the default: 0');
+  notStrictEqual(dable.sortClass, null, 'SortClass is not null');
+  strictEqual(dable.sortClass, 'table-sort',
+    'SortClass is the default: table-sort');
+  strictEqual(dable.sortColumn, null, 'SortColumn is null');
+  notStrictEqual(dable.sortOrder, null, 'SortOrder is not null');
+  strictEqual(dable.sortOrder, 'descending',
+    'SortOrder is the default: descending');
+  notStrictEqual(dable.style, null, 'Style is not null');
+  strictEqual(dable.style, 'none', 'Style is the default: none');
+  notStrictEqual(dable.tableClass, null, 'TableClass is not null');
+  strictEqual(dable.tableClass, '', 'TableClass is empty');
+  notStrictEqual(dable.tfoothtml, null, 'TFootHtml is not null');
+  strictEqual(dable.tfoothtml, '', 'TFootHtml is empty');
 });
 
 module('Pager Tests');
@@ -224,32 +276,33 @@ test('Dable Pager goes forward', function() {
   var dable = new Dable(testDiv.id);
 
   //When: we call page forward and check the first cell of the table
-  dable.NextPage();
+  // dable.NextPage();
+  testDiv.children[2].children[1].children[1].children[0].click();
   var firstCell = testDiv.querySelector('td');
 
   //Then: we see the next page
-  equal(dable.pageNumber, 1);
-  equal(firstCell.innerHTML, '10');
+  strictEqual(dable.pageNumber, 1, 'Current page is 1');
+  strictEqual(firstCell.innerHTML, '10', 'First cell contains 10');
 });
 test('Dable Pager goes backward', function() {
   //Given: a table made into a Dable with more than 1 page and go to page 2
   makeSimpleTable(testDiv);
   var dable = new Dable(testDiv.id);
-  dable.NextPage();
+  testDiv.children[2].children[1].children[1].children[0].click();
 
   //When: we call page backward and check the first cell of the table
-  dable.PreviousPage();
+  testDiv.children[2].children[1].children[0].children[0].click();
   var firstCell = testDiv.querySelector('td');
 
   //Then: we see the first page
-  equal(dable.pageNumber, 0);
-  equal(firstCell.innerHTML, '0');
+  strictEqual(dable.pageNumber, 0, 'Current page is 0');
+  strictEqual(firstCell.innerHTML, '0', 'First cell contains 0');
 });
 
 module('Style Tests');
 test('Dable with style="none" has basic elements', function() {
   //Given: a table
-  document.body.appendChild(testDiv);
+  // document.body.appendChild(testDiv);
   makeSimpleTable(testDiv);
 
   //When: we make it a dable
@@ -258,192 +311,169 @@ test('Dable with style="none" has basic elements', function() {
 
   //Then: we see the elements we expect
   //Element pattern
-  equal(testDiv.children.length, 3);
+  strictEqual(testDiv.children.length, 3);
   var header = testDiv.children[0];
+  var pager = header.children[0];
+  var pageSelect = pager.children[1];
+  var search = header.children[1];
   var table = testDiv.querySelector('table');
+  var headRow = table.children[0].children[0];
+  var tbody = table.children[1];
   var footer = testDiv.children[2];
-  equal(header.children.length, 3);
-  equal(header.children[0].children.length, 2);
-  equal(header.children[0].children[0].children.length, 0);
-  equal(header.children[0].children[1].children.length, 4);
-  equal(header.children[0].children[1].children[0].children.length, 0);
-  equal(header.children[0].children[1].children[1].children.length, 0);
-  equal(header.children[0].children[1].children[2].children.length, 0);
-  equal(header.children[0].children[1].children[3].children.length, 0);
-  equal(header.children[1].children.length, 2);
-  equal(header.children[1].children[0].children.length, 0);
-  equal(header.children[1].children[1].children.length, 0);
-  equal(header.children[2].children.length, 0);
-  equal(footer.children.length, 3);
-  equal(footer.children[0].children.length, 1);
-  equal(footer.children[0].children[0].children.length, 0);
-  equal(footer.children[1].children.length, 2);
-  equal(footer.children[1].children[0].children.length, 1);
-  equal(footer.children[1].children[0].children[0].children.length, 0);
-  equal(footer.children[1].children[1].children[0].children.length, 0);
-  equal(footer.children[2].children.length, 0);
-  equal(table.children.length, 2);
-  equal(table.children[0].children.length, 1);
-  equal(table.children[0].children[0].children.length, 4);
-  equal(table.children[0].children[0].children[0].children.length, 3);
-  equal(table.children[0].children[0].children[1].children.length, 3);
-  equal(table.children[0].children[0].children[2].children.length, 3);
-  equal(table.children[0].children[0].children[3].children.length, 3);
-  equal(table.children[0].children[0].children[0].children[0].children.length,
-    0);
-  equal(table.children[0].children[0].children[1].children[0].children.length,
-    0);
-  equal(table.children[0].children[0].children[2].children[0].children.length,
-    0);
-  equal(table.children[0].children[0].children[3].children[0].children.length,
-    0);
-  equal(table.children[0].children[0].children[0].children[1].children.length,
-    0);
-  equal(table.children[0].children[0].children[1].children[1].children.length,
-    0);
-  equal(table.children[0].children[0].children[2].children[1].children.length,
-    0);
-  equal(table.children[0].children[0].children[3].children[1].children.length,
-    0);
-  equal(table.children[0].children[0].children[0].children[2].children.length,
-    0);
-  equal(table.children[0].children[0].children[1].children[2].children.length,
-    0);
-  equal(table.children[0].children[0].children[2].children[2].children.length,
-    0);
-  equal(table.children[0].children[0].children[3].children[2].children.length,
-    0);
-  equal(table.children[1].children.length, 10);
-  equal(table.children[1].children[0].children.length, 4);
-  equal(table.children[1].children[0].children[0].children.length, 0);
-  equal(table.children[1].children[0].children[1].children.length, 0);
-  equal(table.children[1].children[0].children[2].children.length, 0);
-  equal(table.children[1].children[0].children[3].children.length, 0);
+  strictEqual(header.children.length, 3);
+  strictEqual(pager.children.length, 2);
+  strictEqual(pager.children[0].children.length, 0);
+  strictEqual(pageSelect.children.length, 4);
+  strictEqual(pageSelect.children[0].children.length, 0);
+  strictEqual(pageSelect.children[1].children.length, 0);
+  strictEqual(pageSelect.children[2].children.length, 0);
+  strictEqual(pageSelect.children[3].children.length, 0);
+  strictEqual(search.children.length, 2);
+  strictEqual(search.children[0].children.length, 0);
+  strictEqual(search.children[1].children.length, 0);
+  strictEqual(header.children[2].children.length, 0);
+  strictEqual(footer.children.length, 3);
+  strictEqual(footer.children[0].children.length, 1);
+  strictEqual(footer.children[0].children[0].children.length, 0);
+  strictEqual(footer.children[1].children.length, 2);
+  strictEqual(footer.children[1].children[0].children.length, 1);
+  strictEqual(footer.children[1].children[0].children[0].children.length, 0);
+  strictEqual(footer.children[1].children[1].children[0].children.length, 0);
+  strictEqual(footer.children[2].children.length, 0);
+  strictEqual(table.children.length, 2);
+  strictEqual(table.children[0].children.length, 1);
+  strictEqual(headRow.children.length, 4);
+  strictEqual(headRow.children[0].children.length, 3);
+  strictEqual(headRow.children[1].children.length, 3);
+  strictEqual(headRow.children[2].children.length, 3);
+  strictEqual(headRow.children[3].children.length, 3);
+  strictEqual(headRow.children[0].children[0].children.length, 0);
+  strictEqual(headRow.children[1].children[0].children.length, 0);
+  strictEqual(headRow.children[2].children[0].children.length, 0);
+  strictEqual(headRow.children[3].children[0].children.length, 0);
+  strictEqual(headRow.children[0].children[1].children.length, 0);
+  strictEqual(headRow.children[1].children[1].children.length, 0);
+  strictEqual(headRow.children[2].children[1].children.length, 0);
+  strictEqual(headRow.children[3].children[1].children.length, 0);
+  strictEqual(headRow.children[0].children[2].children.length, 0);
+  strictEqual(headRow.children[1].children[2].children.length, 0);
+  strictEqual(headRow.children[2].children[2].children.length, 0);
+  strictEqual(headRow.children[3].children[2].children.length, 0);
+  strictEqual(tbody.children.length, 10);
+  strictEqual(tbody.children[0].children.length, 4);
+  strictEqual(tbody.children[0].children[0].children.length, 0);
+  strictEqual(tbody.children[0].children[1].children.length, 0);
+  strictEqual(tbody.children[0].children[2].children.length, 0);
+  strictEqual(tbody.children[0].children[3].children.length, 0);
   //IDs
-  equal(header.id, testDiv.id + '_header');
-  equal(footer.id, testDiv.id + '_footer');
-  equal(header.children[1].children[1].id, testDiv.id + '_search');
-  equal(footer.children[0].children[0].id, testDiv.id + '_showing');
-  equal(footer.children[1].children[0].id, testDiv.id + '_page_prev');
-  equal(footer.children[1].children[1].id, testDiv.id + '_page_next');
-  equal(table.children[1].id, testDiv.id + '_body');
+  strictEqual(header.id, testDiv.id + '_header');
+  strictEqual(footer.id, testDiv.id + '_footer');
+  strictEqual(search.children[1].id, testDiv.id + '_search');
+  strictEqual(footer.children[0].children[0].id, testDiv.id + '_showing');
+  strictEqual(footer.children[1].children[0].id, testDiv.id + '_page_prev');
+  strictEqual(footer.children[1].children[1].id, testDiv.id + '_page_next');
+  strictEqual(tbody.id, testDiv.id + '_body');
   //Text
-  equal(header.children[0].children[0].innerHTML, 'Show ');
-  equal(header.children[1].children[0].innerHTML, 'Search ');
-  equal(footer.children[0].children[0].innerHTML,
+  strictEqual(pager.children[0].innerHTML, 'Show ');
+  strictEqual(search.children[0].innerHTML, 'Search ');
+  strictEqual(footer.children[0].children[0].innerHTML,
     'Showing 1 to 10 of 20 entries');
-  equal(header.children[0].children[1].children[0].innerHTML, '10');
-  equal(header.children[0].children[1].children[1].innerHTML, '25');
-  equal(header.children[0].children[1].children[2].innerHTML, '50');
-  equal(header.children[0].children[1].children[3].innerHTML, '100');
-  equal(footer.children[1].children[0].children[0].innerHTML, 'Prev');
-  equal(footer.children[1].children[1].children[0].innerHTML, 'Next');
-  equal(table.children[0].children[0].children[0].children[0].innerHTML,
-    'Column 0 ');
-  equal(table.children[0].children[0].children[1].children[0].innerHTML,
-    'Column 1 ');
-  equal(table.children[0].children[0].children[2].children[0].innerHTML,
-    'Column 2 ');
-  equal(table.children[0].children[0].children[3].children[0].innerHTML,
-    'Column 3 ');
-  equal(table.children[1].children[0].children[0].innerHTML, 0);
-  equal(table.children[1].children[0].children[1].innerHTML, 1);
-  equal(table.children[1].children[0].children[2].innerHTML, 2);
-  equal(table.children[1].children[0].children[3].innerHTML, 3);
+  strictEqual(pageSelect.children[0].innerHTML, '10');
+  strictEqual(pageSelect.children[1].innerHTML, '25');
+  strictEqual(pageSelect.children[2].innerHTML, '50');
+  strictEqual(pageSelect.children[3].innerHTML, '100');
+  strictEqual(footer.children[1].children[0].children[0].innerHTML, 'Prev');
+  strictEqual(footer.children[1].children[1].children[0].innerHTML, 'Next');
+  strictEqual(headRow.children[0].children[0].innerHTML, 'Column 0 ');
+  strictEqual(headRow.children[1].children[0].innerHTML, 'Column 1 ');
+  strictEqual(headRow.children[2].children[0].innerHTML, 'Column 2 ');
+  strictEqual(headRow.children[3].children[0].innerHTML, 'Column 3 ');
+  strictEqual(tbody.children[0].children[0].innerHTML, '0');
+  strictEqual(tbody.children[0].children[1].innerHTML, '1');
+  strictEqual(tbody.children[0].children[2].innerHTML, '2');
+  strictEqual(tbody.children[0].children[3].innerHTML, '3');
   //Values
-  equal(header.children[0].children[1].children[0].value, '10');
-  equal(header.children[0].children[1].children[1].value, '25');
-  equal(header.children[0].children[1].children[2].value, '50');
-  equal(header.children[0].children[1].children[3].value, '100');
+  strictEqual(pageSelect.children[0].value, '10');
+  strictEqual(pageSelect.children[1].value, '25');
+  strictEqual(pageSelect.children[2].value, '50');
+  strictEqual(pageSelect.children[3].value, '100');
   //Styles
-  equal(table.style.width, '100%');
-  equal(header.style.padding, '5px');
-  equal(footer.style.padding, '5px');
-  var myTest = header.children[0].style;
-  equal(floatStyle(myTest), 'left');
-  myTest = header.children[1].style;
-  equal(floatStyle(myTest), 'right');
-  equal(header.children[2].style.clear, 'both');
+  strictEqual(table.style.width, '100%');
+  strictEqual(header.style.padding, '5px');
+  strictEqual(footer.style.padding, '5px');
+  var myTest = pager.style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = search.style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(header.children[2].style.clear, 'both');
   myTest = footer.children[0].style;
-  equal(floatStyle(myTest), 'left');
+  strictEqual(floatStyle(myTest), 'left');
   myTest = footer.children[1].style;
-  equal(floatStyle(myTest), 'right');
-  equal(footer.children[1].style.listStyleType, 'none');
-  equal(footer.children[2].style.clear, 'both');
-  equal(footer.children[1].children[0].style.display, 'inline');
-  equal(footer.children[1].children[1].style.display, 'inline');
-  equal(footer.children[1].children[0].style.marginRight, '5px');
-  equal(footer.children[1].children[1].style.marginRight, '5px');
-  equal(table.children[0].children[0].children[0].style.padding, '5px');
-  equal(table.children[0].children[0].children[1].style.padding, '5px');
-  equal(table.children[0].children[0].children[2].style.padding, '5px');
-  equal(table.children[0].children[0].children[3].style.padding, '5px');
-  myTest = table.children[0].children[0].children[0].children[0].style;
-  equal(floatStyle(myTest), 'left');
-  myTest = table.children[0].children[0].children[0].children[1].style;
-  equal(floatStyle(myTest), 'right');
-  equal(table.children[0].children[0].children[0].children[2].style.clear,
-    'both');
-  myTest = table.children[0].children[0].children[1].children[0].style;
-  equal(floatStyle(myTest), 'left');
-  myTest = table.children[0].children[0].children[1].children[1].style;
-  equal(floatStyle(myTest), 'right');
-  equal(table.children[0].children[0].children[1].children[2].style.clear,
-    'both');
-  myTest = table.children[0].children[0].children[2].children[0].style;
-  equal(floatStyle(myTest), 'left');
-  myTest = table.children[0].children[0].children[2].children[1].style;
-  equal(floatStyle(myTest), 'right');
-  equal(table.children[0].children[0].children[2].children[2].style.clear,
-    'both');
-  myTest = table.children[0].children[0].children[3].children[0].style;
-  equal(floatStyle(myTest), 'left');
-  myTest = table.children[0].children[0].children[3].children[1].style;
-  equal(floatStyle(myTest), 'right');
-  equal(table.children[0].children[0].children[3].children[2].style.clear,
-    'both');
-  equal(rgb2hex(table.children[1].children[0].style.backgroundColor),
-    '#e2e4ff');
-  equal(table.children[1].children[1].style.backgroundColor, 'white');
-  equal(rgb2hex(table.children[1].children[2].style.backgroundColor),
-    '#e2e4ff');
-  equal(table.children[1].children[3].style.backgroundColor, 'white');
-  equal(rgb2hex(table.children[1].children[4].style.backgroundColor),
-    '#e2e4ff');
-  equal(table.children[1].children[5].style.backgroundColor, 'white');
-  equal(rgb2hex(table.children[1].children[6].style.backgroundColor),
-    '#e2e4ff');
-  equal(table.children[1].children[7].style.backgroundColor, 'white');
-  equal(rgb2hex(table.children[1].children[8].style.backgroundColor),
-    '#e2e4ff');
-  equal(table.children[1].children[9].style.backgroundColor, 'white');
-  equal(table.children[1].children[0].children[0].style.padding, '5px');
-  equal(table.children[1].children[0].children[1].style.padding, '5px');
-  equal(table.children[1].children[0].children[2].style.padding, '5px');
-  equal(table.children[1].children[0].children[3].style.padding, '5px');
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(footer.children[1].style.listStyleType, 'none');
+  strictEqual(footer.children[2].style.clear, 'both');
+  strictEqual(footer.children[1].children[0].style.display, 'inline');
+  strictEqual(footer.children[1].children[1].style.display, 'inline');
+  strictEqual(footer.children[1].children[0].style.marginRight, '5px');
+  strictEqual(footer.children[1].children[1].style.marginRight, '5px');
+  strictEqual(headRow.children[0].style.padding, '5px');
+  strictEqual(headRow.children[1].style.padding, '5px');
+  strictEqual(headRow.children[2].style.padding, '5px');
+  strictEqual(headRow.children[3].style.padding, '5px');
+  myTest = headRow.children[0].children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[0].children[1].style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(headRow.children[0].children[2].style.clear, 'both');
+  myTest = headRow.children[1].children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[1].children[1].style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(headRow.children[1].children[2].style.clear, 'both');
+  myTest = headRow.children[2].children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[2].children[1].style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(headRow.children[2].children[2].style.clear, 'both');
+  myTest = headRow.children[3].children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[3].children[1].style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(headRow.children[3].children[2].style.clear, 'both');
+  strictEqual(rgb2hex(tbody.children[0].style.backgroundColor), '#e2e4ff');
+  strictEqual(tbody.children[1].style.backgroundColor, 'white');
+  strictEqual(rgb2hex(tbody.children[2].style.backgroundColor), '#e2e4ff');
+  strictEqual(tbody.children[3].style.backgroundColor, 'white');
+  strictEqual(rgb2hex(tbody.children[4].style.backgroundColor), '#e2e4ff');
+  strictEqual(tbody.children[5].style.backgroundColor, 'white');
+  strictEqual(rgb2hex(tbody.children[6].style.backgroundColor), '#e2e4ff');
+  strictEqual(tbody.children[7].style.backgroundColor, 'white');
+  strictEqual(rgb2hex(tbody.children[8].style.backgroundColor), '#e2e4ff');
+  strictEqual(tbody.children[9].style.backgroundColor, 'white');
+  strictEqual(tbody.children[0].children[0].style.padding, '5px');
+  strictEqual(tbody.children[0].children[1].style.padding, '5px');
+  strictEqual(tbody.children[0].children[2].style.padding, '5px');
+  strictEqual(tbody.children[0].children[3].style.padding, '5px');
   //Classes
-  equal(footer.children[1].children[0].className, 'table-page');
-  equal(footer.children[1].children[1].className, 'table-page');
-  equal(table.children[0].children[0].children[0].children[1].className,
-    'table-sort');
-  equal(table.children[0].children[0].children[1].children[1].className,
-    'table-sort');
-  equal(table.children[0].children[0].children[2].children[1].className,
-    'table-sort');
-  equal(table.children[0].children[0].children[3].children[1].className,
-    'table-sort');
-  equal(table.children[1].children[0].className, 'table-row-even');
-  equal(table.children[1].children[1].className, 'table-row-odd');
-  equal(table.children[1].children[2].className, 'table-row-even');
-  equal(table.children[1].children[3].className, 'table-row-odd');
-  equal(table.children[1].children[4].className, 'table-row-even');
-  equal(table.children[1].children[5].className, 'table-row-odd');
-  equal(table.children[1].children[6].className, 'table-row-even');
-  equal(table.children[1].children[7].className, 'table-row-odd');
-  equal(table.children[1].children[8].className, 'table-row-even');
-  equal(table.children[1].children[9].className, 'table-row-odd');
+  strictEqual(footer.children[1].children[0].className, 'table-page');
+  strictEqual(footer.children[1].children[1].className, 'table-page');
+  strictEqual(headRow.children[0].children[1].className, 'table-sort');
+  strictEqual(headRow.children[1].children[1].className, 'table-sort');
+  strictEqual(headRow.children[2].children[1].className, 'table-sort');
+  strictEqual(headRow.children[3].children[1].className, 'table-sort');
+  strictEqual(tbody.children[0].className, 'table-row-even');
+  strictEqual(tbody.children[1].className, 'table-row-odd');
+  strictEqual(tbody.children[2].className, 'table-row-even');
+  strictEqual(tbody.children[3].className, 'table-row-odd');
+  strictEqual(tbody.children[4].className, 'table-row-even');
+  strictEqual(tbody.children[5].className, 'table-row-odd');
+  strictEqual(tbody.children[6].className, 'table-row-even');
+  strictEqual(tbody.children[7].className, 'table-row-odd');
+  strictEqual(tbody.children[8].className, 'table-row-even');
+  strictEqual(tbody.children[9].className, 'table-row-odd');
   //State
-  equal(footer.children[1].children[0].getAttribute('disabled'), 'disabled');
+  strictEqual(footer.children[1].children[0].getAttribute('disabled'),
+    'disabled');
 });
 test('Dable with style="clear" has basic elements but no style', function() {
   //Given: a table
@@ -457,188 +487,165 @@ test('Dable with style="clear" has basic elements but no style', function() {
 
   //Then: we see the elements we expect
   //Element pattern
-  equal(testDiv.children.length, 3);
+  strictEqual(testDiv.children.length, 3);
   var header = testDiv.children[0];
+  var pager = header.children[0];
+  var pageSelect = pager.children[1];
+  var search = header.children[1];
   var table = testDiv.querySelector('table');
+  var headRow = table.children[0].children[0];
+  var tbody = table.children[1];
   var footer = testDiv.children[2];
-  equal(header.children.length, 3);
-  equal(header.children[0].children.length, 2);
-  equal(header.children[0].children[0].children.length, 0);
-  equal(header.children[0].children[1].children.length, 4);
-  equal(header.children[0].children[1].children[0].children.length, 0);
-  equal(header.children[0].children[1].children[1].children.length, 0);
-  equal(header.children[0].children[1].children[2].children.length, 0);
-  equal(header.children[0].children[1].children[3].children.length, 0);
-  equal(header.children[1].children.length, 2);
-  equal(header.children[1].children[0].children.length, 0);
-  equal(header.children[1].children[1].children.length, 0);
-  equal(header.children[2].children.length, 0);
-  equal(footer.children.length, 3);
-  equal(footer.children[0].children.length, 1);
-  equal(footer.children[0].children[0].children.length, 0);
-  equal(footer.children[1].children.length, 2);
-  equal(footer.children[1].children[0].children.length, 1);
-  equal(footer.children[1].children[0].children[0].children.length, 0);
-  equal(footer.children[1].children[1].children[0].children.length, 0);
-  equal(footer.children[2].children.length, 0);
-  equal(table.children.length, 2);
-  equal(table.children[0].children.length, 1);
-  equal(table.children[0].children[0].children.length, 4);
-  equal(table.children[0].children[0].children[0].children.length, 3);
-  equal(table.children[0].children[0].children[1].children.length, 3);
-  equal(table.children[0].children[0].children[2].children.length, 3);
-  equal(table.children[0].children[0].children[3].children.length, 3);
-  equal(table.children[0].children[0].children[0].children[0].children.length,
-    0);
-  equal(table.children[0].children[0].children[1].children[0].children.length,
-    0);
-  equal(table.children[0].children[0].children[2].children[0].children.length,
-    0);
-  equal(table.children[0].children[0].children[3].children[0].children.length,
-    0);
-  equal(table.children[0].children[0].children[0].children[1].children.length,
-    0);
-  equal(table.children[0].children[0].children[1].children[1].children.length,
-    0);
-  equal(table.children[0].children[0].children[2].children[1].children.length,
-    0);
-  equal(table.children[0].children[0].children[3].children[1].children.length,
-    0);
-  equal(table.children[0].children[0].children[0].children[2].children.length,
-    0);
-  equal(table.children[0].children[0].children[1].children[2].children.length,
-    0);
-  equal(table.children[0].children[0].children[2].children[2].children.length,
-    0);
-  equal(table.children[0].children[0].children[3].children[2].children.length,
-    0);
-  equal(table.children[1].children.length, 10);
-  equal(table.children[1].children[0].children.length, 4);
-  equal(table.children[1].children[0].children[0].children.length, 0);
-  equal(table.children[1].children[0].children[1].children.length, 0);
-  equal(table.children[1].children[0].children[2].children.length, 0);
-  equal(table.children[1].children[0].children[3].children.length, 0);
+  strictEqual(header.children.length, 3);
+  strictEqual(pager.children.length, 2);
+  strictEqual(pager.children[0].children.length, 0);
+  strictEqual(pageSelect.children.length, 4);
+  strictEqual(pageSelect.children[0].children.length, 0);
+  strictEqual(pageSelect.children[1].children.length, 0);
+  strictEqual(pageSelect.children[2].children.length, 0);
+  strictEqual(pageSelect.children[3].children.length, 0);
+  strictEqual(search.children.length, 2);
+  strictEqual(search.children[0].children.length, 0);
+  strictEqual(search.children[1].children.length, 0);
+  strictEqual(header.children[2].children.length, 0);
+  strictEqual(footer.children.length, 3);
+  strictEqual(footer.children[0].children.length, 1);
+  strictEqual(footer.children[0].children[0].children.length, 0);
+  strictEqual(footer.children[1].children.length, 2);
+  strictEqual(footer.children[1].children[0].children.length, 1);
+  strictEqual(footer.children[1].children[0].children[0].children.length, 0);
+  strictEqual(footer.children[1].children[1].children[0].children.length, 0);
+  strictEqual(footer.children[2].children.length, 0);
+  strictEqual(table.children.length, 2);
+  strictEqual(table.children[0].children.length, 1);
+  strictEqual(headRow.children.length, 4);
+  strictEqual(headRow.children[0].children.length, 3);
+  strictEqual(headRow.children[1].children.length, 3);
+  strictEqual(headRow.children[2].children.length, 3);
+  strictEqual(headRow.children[3].children.length, 3);
+  strictEqual(headRow.children[0].children[0].children.length, 0);
+  strictEqual(headRow.children[1].children[0].children.length, 0);
+  strictEqual(headRow.children[2].children[0].children.length, 0);
+  strictEqual(headRow.children[3].children[0].children.length, 0);
+  strictEqual(headRow.children[0].children[1].children.length, 0);
+  strictEqual(headRow.children[1].children[1].children.length, 0);
+  strictEqual(headRow.children[2].children[1].children.length, 0);
+  strictEqual(headRow.children[3].children[1].children.length, 0);
+  strictEqual(headRow.children[0].children[2].children.length, 0);
+  strictEqual(headRow.children[1].children[2].children.length, 0);
+  strictEqual(headRow.children[2].children[2].children.length, 0);
+  strictEqual(headRow.children[3].children[2].children.length, 0);
+  strictEqual(tbody.children.length, 10);
+  strictEqual(tbody.children[0].children.length, 4);
+  strictEqual(tbody.children[0].children[0].children.length, 0);
+  strictEqual(tbody.children[0].children[1].children.length, 0);
+  strictEqual(tbody.children[0].children[2].children.length, 0);
+  strictEqual(tbody.children[0].children[3].children.length, 0);
   //IDs
-  equal(header.id, testDiv.id + '_header');
-  equal(footer.id, testDiv.id + '_footer');
-  equal(header.children[1].children[1].id, testDiv.id + '_search');
-  equal(footer.children[0].children[0].id, testDiv.id + '_showing');
-  equal(footer.children[1].children[0].id, testDiv.id + '_page_prev');
-  equal(footer.children[1].children[1].id, testDiv.id + '_page_next');
-  equal(table.children[1].id, testDiv.id + '_body');
+  strictEqual(header.id, testDiv.id + '_header');
+  strictEqual(footer.id, testDiv.id + '_footer');
+  strictEqual(search.children[1].id, testDiv.id + '_search');
+  strictEqual(footer.children[0].children[0].id, testDiv.id + '_showing');
+  strictEqual(footer.children[1].children[0].id, testDiv.id + '_page_prev');
+  strictEqual(footer.children[1].children[1].id, testDiv.id + '_page_next');
+  strictEqual(tbody.id, testDiv.id + '_body');
   //Text
-  equal(header.children[0].children[0].innerHTML, 'Show ');
-  equal(header.children[1].children[0].innerHTML, 'Search ');
-  equal(footer.children[0].children[0].innerHTML,
+  strictEqual(pager.children[0].innerHTML, 'Show ');
+  strictEqual(search.children[0].innerHTML, 'Search ');
+  strictEqual(footer.children[0].children[0].innerHTML,
     'Showing 1 to 10 of 20 entries');
-  equal(header.children[0].children[1].children[0].innerHTML, '10');
-  equal(header.children[0].children[1].children[1].innerHTML, '25');
-  equal(header.children[0].children[1].children[2].innerHTML, '50');
-  equal(header.children[0].children[1].children[3].innerHTML, '100');
-  equal(footer.children[1].children[0].children[0].innerHTML, 'Prev');
-  equal(footer.children[1].children[1].children[0].innerHTML, 'Next');
-  equal(table.children[0].children[0].children[0].children[0].innerHTML,
-    'Column 0 ');
-  equal(table.children[0].children[0].children[1].children[0].innerHTML,
-    'Column 1 ');
-  equal(table.children[0].children[0].children[2].children[0].innerHTML,
-    'Column 2 ');
-  equal(table.children[0].children[0].children[3].children[0].innerHTML,
-    'Column 3 ');
-  equal(table.children[1].children[0].children[0].innerHTML, 0);
-  equal(table.children[1].children[0].children[1].innerHTML, 1);
-  equal(table.children[1].children[0].children[2].innerHTML, 2);
-  equal(table.children[1].children[0].children[3].innerHTML, 3);
+  strictEqual(pageSelect.children[0].innerHTML, '10');
+  strictEqual(pageSelect.children[1].innerHTML, '25');
+  strictEqual(pageSelect.children[2].innerHTML, '50');
+  strictEqual(pageSelect.children[3].innerHTML, '100');
+  strictEqual(footer.children[1].children[0].children[0].innerHTML, 'Prev');
+  strictEqual(footer.children[1].children[1].children[0].innerHTML, 'Next');
+  strictEqual(headRow.children[0].children[0].innerHTML, 'Column 0 ');
+  strictEqual(headRow.children[1].children[0].innerHTML, 'Column 1 ');
+  strictEqual(headRow.children[2].children[0].innerHTML, 'Column 2 ');
+  strictEqual(headRow.children[3].children[0].innerHTML, 'Column 3 ');
+  strictEqual(tbody.children[0].children[0].innerHTML, '0');
+  strictEqual(tbody.children[0].children[1].innerHTML, '1');
+  strictEqual(tbody.children[0].children[2].innerHTML, '2');
+  strictEqual(tbody.children[0].children[3].innerHTML, '3');
   //Values
-  equal(header.children[0].children[1].children[0].value, '10');
-  equal(header.children[0].children[1].children[1].value, '25');
-  equal(header.children[0].children[1].children[2].value, '50');
-  equal(header.children[0].children[1].children[3].value, '100');
+  strictEqual(pageSelect.children[0].value, '10');
+  strictEqual(pageSelect.children[1].value, '25');
+  strictEqual(pageSelect.children[2].value, '50');
+  strictEqual(pageSelect.children[3].value, '100');
   //Styles
-  notEqual(table.style.width, '100%');
-  notEqual(header.style.padding, '5px');
-  notEqual(footer.style.padding, '5px');
-  notEqual(header.children[0].style.float, 'left');
-  notEqual(header.children[1].style.float, 'right');
-  notEqual(header.children[2].style.clear, 'both');
-  notEqual(footer.children[0].style.float, 'left');
-  notEqual(footer.children[1].style.float, 'right');
-  notEqual(footer.children[1].style.listStyle, 'none');
-  notEqual(footer.children[2].style.clear, 'both');
-  notEqual(footer.children[1].children[0].style.display, 'inline');
-  notEqual(footer.children[1].children[1].style.display, 'inline');
-  notEqual(footer.children[1].children[0].style.marginRight, '5px');
-  notEqual(footer.children[1].children[1].style.marginRight, '5px');
-  notEqual(table.children[0].children[0].children[0].style.padding, '5px');
-  notEqual(table.children[0].children[0].children[1].style.padding, '5px');
-  notEqual(table.children[0].children[0].children[2].style.padding, '5px');
-  notEqual(table.children[0].children[0].children[3].style.padding, '5px');
-  var myTest = table.children[0].children[0].children[0].children[0].style;
-  notEqual(floatStyle(myTest), 'left');
-  myTest = table.children[0].children[0].children[0].children[1].style;
-  notEqual(floatStyle(myTest), 'right');
-  notEqual(table.children[0].children[0].children[0].children[2].style.clear,
-    'both');
-  myTest = table.children[0].children[0].children[1].children[0].style;
-  notEqual(floatStyle(myTest), 'left');
-  myTest = table.children[0].children[0].children[1].children[1].style;
-  notEqual(floatStyle(myTest), 'right');
-  notEqual(table.children[0].children[0].children[1].children[2].style.clear,
-    'both');
-  myTest = table.children[0].children[0].children[2].children[0].style;
-  notEqual(floatStyle(myTest), 'left');
-  myTest = table.children[0].children[0].children[2].children[1].style;
-  notEqual(floatStyle(myTest), 'right');
-  notEqual(table.children[0].children[0].children[2].children[2].style.clear,
-    'both');
-  myTest = table.children[0].children[0].children[3].children[0].style;
-  notEqual(floatStyle(myTest), 'left');
-  myTest = table.children[0].children[0].children[3].children[1].style;
-  notEqual(floatStyle(myTest), 'right');
-  notEqual(table.children[0].children[0].children[3].children[2].style.clear,
-    'both');
-  notEqual(table.children[1].children[0].style.backgroundColor,
-    'rgb(226, 228, 255)');
-  notEqual(table.children[1].children[1].style.backgroundColor, 'white');
-  notEqual(table.children[1].children[2].style.backgroundColor,
-    'rgb(226, 228, 255)');
-  notEqual(table.children[1].children[3].style.backgroundColor, 'white');
-  notEqual(table.children[1].children[4].style.backgroundColor,
-    'rgb(226, 228, 255)');
-  notEqual(table.children[1].children[5].style.backgroundColor, 'white');
-  notEqual(table.children[1].children[6].style.backgroundColor,
-    'rgb(226, 228, 255)');
-  notEqual(table.children[1].children[7].style.backgroundColor, 'white');
-  notEqual(table.children[1].children[8].style.backgroundColor,
-    'rgb(226, 228, 255)');
-  notEqual(table.children[1].children[9].style.backgroundColor, 'white');
-  notEqual(table.children[1].children[0].children[0].style.padding, '5px');
-  notEqual(table.children[1].children[0].children[1].style.padding, '5px');
-  notEqual(table.children[1].children[0].children[2].style.padding, '5px');
-  notEqual(table.children[1].children[0].children[3].style.padding, '5px');
+  notStrictEqual(table.style.width, '100%');
+  notStrictEqual(header.style.padding, '5px');
+  notStrictEqual(footer.style.padding, '5px');
+  notStrictEqual(pager.style.float, 'left');
+  notStrictEqual(search.style.float, 'right');
+  notStrictEqual(header.children[2].style.clear, 'both');
+  notStrictEqual(footer.children[0].style.float, 'left');
+  notStrictEqual(footer.children[1].style.float, 'right');
+  notStrictEqual(footer.children[1].style.listStyle, 'none');
+  notStrictEqual(footer.children[2].style.clear, 'both');
+  notStrictEqual(footer.children[1].children[0].style.display, 'inline');
+  notStrictEqual(footer.children[1].children[1].style.display, 'inline');
+  notStrictEqual(footer.children[1].children[0].style.marginRight, '5px');
+  notStrictEqual(footer.children[1].children[1].style.marginRight, '5px');
+  notStrictEqual(headRow.children[0].style.padding, '5px');
+  notStrictEqual(headRow.children[1].style.padding, '5px');
+  notStrictEqual(headRow.children[2].style.padding, '5px');
+  notStrictEqual(headRow.children[3].style.padding, '5px');
+  var myTest = headRow.children[0].children[0].style;
+  notStrictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[0].children[1].style;
+  notStrictEqual(floatStyle(myTest), 'right');
+  notStrictEqual(headRow.children[0].children[2].style.clear, 'both');
+  myTest = headRow.children[1].children[0].style;
+  notStrictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[1].children[1].style;
+  notStrictEqual(floatStyle(myTest), 'right');
+  notStrictEqual(headRow.children[1].children[2].style.clear, 'both');
+  myTest = headRow.children[2].children[0].style;
+  notStrictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[2].children[1].style;
+  notStrictEqual(floatStyle(myTest), 'right');
+  notStrictEqual(headRow.children[2].children[2].style.clear, 'both');
+  myTest = headRow.children[3].children[0].style;
+  notStrictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[3].children[1].style;
+  notStrictEqual(floatStyle(myTest), 'right');
+  notStrictEqual(headRow.children[3].children[2].style.clear, 'both');
+  notStrictEqual(rgb2hex(tbody.children[0].style.backgroundColor), '#e2e4ff');
+  notStrictEqual(tbody.children[1].style.backgroundColor, 'white');
+  notStrictEqual(rgb2hex(tbody.children[2].style.backgroundColor), '#e2e4ff');
+  notStrictEqual(tbody.children[3].style.backgroundColor, 'white');
+  notStrictEqual(rgb2hex(tbody.children[4].style.backgroundColor), '#e2e4ff');
+  notStrictEqual(tbody.children[5].style.backgroundColor, 'white');
+  notStrictEqual(rgb2hex(tbody.children[6].style.backgroundColor), '#e2e4ff');
+  notStrictEqual(tbody.children[7].style.backgroundColor, 'white');
+  notStrictEqual(rgb2hex(tbody.children[8].style.backgroundColor), '#e2e4ff');
+  notStrictEqual(tbody.children[9].style.backgroundColor, 'white');
+  notStrictEqual(tbody.children[0].children[0].style.padding, '5px');
+  notStrictEqual(tbody.children[0].children[1].style.padding, '5px');
+  notStrictEqual(tbody.children[0].children[2].style.padding, '5px');
+  notStrictEqual(tbody.children[0].children[3].style.padding, '5px');
   //Classes
-  equal(footer.children[1].children[0].className, 'table-page');
-  equal(footer.children[1].children[1].className, 'table-page');
-  equal(table.children[0].children[0].children[0].children[1].className,
-    'table-sort');
-  equal(table.children[0].children[0].children[1].children[1].className,
-    'table-sort');
-  equal(table.children[0].children[0].children[2].children[1].className,
-    'table-sort');
-  equal(table.children[0].children[0].children[3].children[1].className,
-    'table-sort');
-  equal(table.children[1].children[0].className, 'table-row-even');
-  equal(table.children[1].children[1].className, 'table-row-odd');
-  equal(table.children[1].children[2].className, 'table-row-even');
-  equal(table.children[1].children[3].className, 'table-row-odd');
-  equal(table.children[1].children[4].className, 'table-row-even');
-  equal(table.children[1].children[5].className, 'table-row-odd');
-  equal(table.children[1].children[6].className, 'table-row-even');
-  equal(table.children[1].children[7].className, 'table-row-odd');
-  equal(table.children[1].children[8].className, 'table-row-even');
-  equal(table.children[1].children[9].className, 'table-row-odd');
+  strictEqual(footer.children[1].children[0].className, 'table-page');
+  strictEqual(footer.children[1].children[1].className, 'table-page');
+  strictEqual(headRow.children[0].children[1].className, 'table-sort');
+  strictEqual(headRow.children[1].children[1].className, 'table-sort');
+  strictEqual(headRow.children[2].children[1].className, 'table-sort');
+  strictEqual(headRow.children[3].children[1].className, 'table-sort');
+  strictEqual(tbody.children[0].className, 'table-row-even');
+  strictEqual(tbody.children[1].className, 'table-row-odd');
+  strictEqual(tbody.children[2].className, 'table-row-even');
+  strictEqual(tbody.children[3].className, 'table-row-odd');
+  strictEqual(tbody.children[4].className, 'table-row-even');
+  strictEqual(tbody.children[5].className, 'table-row-odd');
+  strictEqual(tbody.children[6].className, 'table-row-even');
+  strictEqual(tbody.children[7].className, 'table-row-odd');
+  strictEqual(tbody.children[8].className, 'table-row-even');
+  strictEqual(tbody.children[9].className, 'table-row-odd');
   //State
-  equal(footer.children[1].children[0].getAttribute('disabled'), 'disabled');
+  strictEqual(footer.children[1].children[0].getAttribute('disabled'),
+    'disabled');
 });
 test('Dable with style="bootstrap" has basic elements and slightly ' +
     'different styling and classes', function() {
@@ -653,195 +660,367 @@ test('Dable with style="bootstrap" has basic elements and slightly ' +
 
   //Then: we see the elements we expect
   //Element pattern
-  equal(testDiv.children.length, 3);
+  strictEqual(testDiv.children.length, 3);
   var header = testDiv.children[0];
+  var pager = header.children[0];
+  var pageSelect = pager.children[1];
+  var search = header.children[1];
   var table = testDiv.querySelector('table');
+  var headRow = table.children[0].children[0];
+  var tbody = table.children[1];
   var footer = testDiv.children[2];
-  equal(header.children.length, 3);
-  equal(header.children[0].children.length, 2);
-  equal(header.children[0].children[0].children.length, 0);
-  equal(header.children[0].children[1].children.length, 4);
-  equal(header.children[0].children[1].children[0].children.length, 0);
-  equal(header.children[0].children[1].children[1].children.length, 0);
-  equal(header.children[0].children[1].children[2].children.length, 0);
-  equal(header.children[0].children[1].children[3].children.length, 0);
-  equal(header.children[1].children.length, 2);
-  equal(header.children[1].children[0].children.length, 0);
-  equal(header.children[1].children[1].children.length, 0);
-  equal(header.children[2].children.length, 0);
-  equal(footer.children.length, 3);
-  equal(footer.children[0].children.length, 1);
-  equal(footer.children[0].children[0].children.length, 0);
-  equal(footer.children[1].children.length, 2);
-  equal(footer.children[1].children[0].children.length, 1);
-  equal(footer.children[1].children[0].children[0].children.length, 0);
-  equal(footer.children[1].children[1].children[0].children.length, 0);
-  equal(footer.children[2].children.length, 0);
-  equal(table.children.length, 2);
-  equal(table.children[0].children.length, 1);
-  equal(table.children[0].children[0].children.length, 4);
-  equal(table.children[0].children[0].children[0].children.length, 3);
-  equal(table.children[0].children[0].children[1].children.length, 3);
-  equal(table.children[0].children[0].children[2].children.length, 3);
-  equal(table.children[0].children[0].children[3].children.length, 3);
-  equal(table.children[0].children[0].children[0].children[0].children.length,
-    0);
-  equal(table.children[0].children[0].children[1].children[0].children.length,
-    0);
-  equal(table.children[0].children[0].children[2].children[0].children.length,
-    0);
-  equal(table.children[0].children[0].children[3].children[0].children.length,
-    0);
-  equal(table.children[0].children[0].children[0].children[1].children.length,
-    0);
-  equal(table.children[0].children[0].children[1].children[1].children.length,
-    0);
-  equal(table.children[0].children[0].children[2].children[1].children.length,
-    0);
-  equal(table.children[0].children[0].children[3].children[1].children.length,
-    0);
-  equal(table.children[0].children[0].children[0].children[2].children.length,
-    0);
-  equal(table.children[0].children[0].children[1].children[2].children.length,
-    0);
-  equal(table.children[0].children[0].children[2].children[2].children.length,
-    0);
-  equal(table.children[0].children[0].children[3].children[2].children.length,
-    0);
-  equal(table.children[1].children.length, 10);
-  equal(table.children[1].children[0].children.length, 4);
-  equal(table.children[1].children[0].children[0].children.length, 0);
-  equal(table.children[1].children[0].children[1].children.length, 0);
-  equal(table.children[1].children[0].children[2].children.length, 0);
-  equal(table.children[1].children[0].children[3].children.length, 0);
+  strictEqual(header.children.length, 3);
+  strictEqual(pager.children.length, 2);
+  strictEqual(pager.children[0].children.length, 0);
+  strictEqual(pageSelect.children.length, 4);
+  strictEqual(pageSelect.children[0].children.length, 0);
+  strictEqual(pageSelect.children[1].children.length, 0);
+  strictEqual(pageSelect.children[2].children.length, 0);
+  strictEqual(pageSelect.children[3].children.length, 0);
+  strictEqual(search.children.length, 2);
+  strictEqual(search.children[0].children.length, 0);
+  strictEqual(search.children[1].children.length, 0);
+  strictEqual(header.children[2].children.length, 0);
+  strictEqual(footer.children.length, 3);
+  strictEqual(footer.children[0].children.length, 1);
+  strictEqual(footer.children[0].children[0].children.length, 0);
+  strictEqual(footer.children[1].children.length, 2);
+  strictEqual(footer.children[1].children[0].children.length, 1);
+  strictEqual(footer.children[1].children[0].children[0].children.length, 0);
+  strictEqual(footer.children[1].children[1].children[0].children.length, 0);
+  strictEqual(footer.children[2].children.length, 0);
+  strictEqual(table.children.length, 2);
+  strictEqual(table.children[0].children.length, 1);
+  strictEqual(headRow.children.length, 4);
+  strictEqual(headRow.children[0].children.length, 3);
+  strictEqual(headRow.children[1].children.length, 3);
+  strictEqual(headRow.children[2].children.length, 3);
+  strictEqual(headRow.children[3].children.length, 3);
+  strictEqual(headRow.children[0].children[0].children.length, 0);
+  strictEqual(headRow.children[1].children[0].children.length, 0);
+  strictEqual(headRow.children[2].children[0].children.length, 0);
+  strictEqual(headRow.children[3].children[0].children.length, 0);
+  strictEqual(headRow.children[0].children[1].children.length, 0);
+  strictEqual(headRow.children[1].children[1].children.length, 0);
+  strictEqual(headRow.children[2].children[1].children.length, 0);
+  strictEqual(headRow.children[3].children[1].children.length, 0);
+  strictEqual(headRow.children[0].children[2].children.length, 0);
+  strictEqual(headRow.children[1].children[2].children.length, 0);
+  strictEqual(headRow.children[2].children[2].children.length, 0);
+  strictEqual(headRow.children[3].children[2].children.length, 0);
+  strictEqual(tbody.children.length, 10);
+  strictEqual(tbody.children[0].children.length, 4);
+  strictEqual(tbody.children[0].children[0].children.length, 0);
+  strictEqual(tbody.children[0].children[1].children.length, 0);
+  strictEqual(tbody.children[0].children[2].children.length, 0);
+  strictEqual(tbody.children[0].children[3].children.length, 0);
   //IDs
-  equal(header.id, testDiv.id + '_header');
-  equal(footer.id, testDiv.id + '_footer');
-  equal(header.children[1].children[1].id, testDiv.id + '_search');
-  equal(footer.children[0].children[0].id, testDiv.id + '_showing');
-  equal(footer.children[1].children[0].id, testDiv.id + '_page_prev');
-  equal(footer.children[1].children[1].id, testDiv.id + '_page_next');
-  equal(table.children[1].id, testDiv.id + '_body');
+  strictEqual(header.id, testDiv.id + '_header');
+  strictEqual(footer.id, testDiv.id + '_footer');
+  strictEqual(search.children[1].id, testDiv.id + '_search');
+  strictEqual(footer.children[0].children[0].id, testDiv.id + '_showing');
+  strictEqual(footer.children[1].children[0].id, testDiv.id + '_page_prev');
+  strictEqual(footer.children[1].children[1].id, testDiv.id + '_page_next');
+  strictEqual(tbody.id, testDiv.id + '_body');
   //Text
-  equal(header.children[0].children[0].innerHTML, 'Show ');
-  equal(header.children[1].children[0].innerHTML, 'Search ');
-  equal(footer.children[0].children[0].innerHTML,
+  strictEqual(pager.children[0].innerHTML, 'Show ');
+  strictEqual(search.children[0].innerHTML, 'Search ');
+  strictEqual(footer.children[0].children[0].innerHTML,
     'Showing 1 to 10 of 20 entries');
-  equal(header.children[0].children[1].children[0].innerHTML, '10');
-  equal(header.children[0].children[1].children[1].innerHTML, '25');
-  equal(header.children[0].children[1].children[2].innerHTML, '50');
-  equal(header.children[0].children[1].children[3].innerHTML, '100');
+  strictEqual(pageSelect.children[0].innerHTML, '10');
+  strictEqual(pageSelect.children[1].innerHTML, '25');
+  strictEqual(pageSelect.children[2].innerHTML, '50');
+  strictEqual(pageSelect.children[3].innerHTML, '100');
   // different from default
-  equal(footer.children[1].children[0].children[0].innerHTML, '');
-  equal(footer.children[1].children[1].children[0].innerHTML, '');
+  strictEqual(footer.children[1].children[0].children[0].innerHTML, '');
+  strictEqual(footer.children[1].children[1].children[0].innerHTML, '');
   // /different
-  equal(table.children[0].children[0].children[0].children[0].innerHTML,
-    'Column 0 ');
-  equal(table.children[0].children[0].children[1].children[0].innerHTML,
-    'Column 1 ');
-  equal(table.children[0].children[0].children[2].children[0].innerHTML,
-    'Column 2 ');
-  equal(table.children[0].children[0].children[3].children[0].innerHTML,
-    'Column 3 ');
-  equal(table.children[1].children[0].children[0].innerHTML, 0);
-  equal(table.children[1].children[0].children[1].innerHTML, 1);
-  equal(table.children[1].children[0].children[2].innerHTML, 2);
-  equal(table.children[1].children[0].children[3].innerHTML, 3);
+  strictEqual(headRow.children[0].children[0].innerHTML, 'Column 0 ');
+  strictEqual(headRow.children[1].children[0].innerHTML, 'Column 1 ');
+  strictEqual(headRow.children[2].children[0].innerHTML, 'Column 2 ');
+  strictEqual(headRow.children[3].children[0].innerHTML, 'Column 3 ');
+  strictEqual(tbody.children[0].children[0].innerHTML, '0');
+  strictEqual(tbody.children[0].children[1].innerHTML, '1');
+  strictEqual(tbody.children[0].children[2].innerHTML, '2');
+  strictEqual(tbody.children[0].children[3].innerHTML, '3');
   //Values
-  equal(header.children[0].children[1].children[0].value, '10');
-  equal(header.children[0].children[1].children[1].value, '25');
-  equal(header.children[0].children[1].children[2].value, '50');
-  equal(header.children[0].children[1].children[3].value, '100');
+  strictEqual(pageSelect.children[0].value, '10');
+  strictEqual(pageSelect.children[1].value, '25');
+  strictEqual(pageSelect.children[2].value, '50');
+  strictEqual(pageSelect.children[3].value, '100');
   //Styles
-  equal(table.style.width, '100%');
-  equal(header.style.padding, '5px');
-  equal(footer.style.padding, '5px');
-  var myTest = header.children[0].style;
-  equal(floatStyle(myTest), 'left');
-  myTest = header.children[1].style;
-  equal(floatStyle(myTest), 'right');
-  equal(header.children[2].style.clear, 'both');
+  strictEqual(table.style.width, '100%');
+  strictEqual(header.style.padding, '5px');
+  strictEqual(footer.style.padding, '5px');
+  var myTest = pager.style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = search.style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(header.children[2].style.clear, 'both');
   myTest = footer.children[0].style;
-  equal(floatStyle(myTest), 'left');
+  strictEqual(floatStyle(myTest), 'left');
   myTest = footer.children[1].style;
-  equal(floatStyle(myTest), 'right');
-  equal(footer.children[1].style.listStyleType, 'none');
-  equal(footer.children[2].style.clear, 'both');
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(footer.children[1].style.listStyleType, 'none');
+  strictEqual(footer.children[2].style.clear, 'both');
   // different from default
-  equal(footer.children[1].children[0].style.display, '');
-  equal(footer.children[1].children[1].style.display, '');
-  equal(footer.children[1].children[0].style.marginRight, '');
-  equal(footer.children[1].children[1].style.marginRight, '');
+  strictEqual(footer.children[1].children[0].style.display, '');
+  strictEqual(footer.children[1].children[1].style.display, '');
+  strictEqual(footer.children[1].children[0].style.marginRight, '');
+  strictEqual(footer.children[1].children[1].style.marginRight, '');
   // /different
-  equal(table.children[0].children[0].children[0].style.padding, '5px');
-  equal(table.children[0].children[0].children[1].style.padding, '5px');
-  equal(table.children[0].children[0].children[2].style.padding, '5px');
-  equal(table.children[0].children[0].children[3].style.padding, '5px');
-  myTest = table.children[0].children[0].children[0].children[0].style;
-  equal(floatStyle(myTest), 'left');
-  myTest = table.children[0].children[0].children[0].children[1].style;
-  equal(floatStyle(myTest), 'right');
-  equal(table.children[0].children[0].children[0].children[2].style.clear,
-    'both');
-  myTest = table.children[0].children[0].children[1].children[0].style;
-  equal(floatStyle(myTest), 'left');
-  myTest = table.children[0].children[0].children[1].children[1].style;
-  equal(floatStyle(myTest), 'right');
-  equal(table.children[0].children[0].children[1].children[2].style.clear,
-    'both');
-  myTest = table.children[0].children[0].children[2].children[0].style;
-  equal(floatStyle(myTest), 'left');
-  myTest = table.children[0].children[0].children[2].children[1].style;
-  equal(floatStyle(myTest), 'right');
-  equal(table.children[0].children[0].children[2].children[2].style.clear,
-    'both');
-  myTest = table.children[0].children[0].children[3].children[0].style;
-  equal(floatStyle(myTest), 'left');
-  myTest = table.children[0].children[0].children[3].children[1].style;
-  equal(floatStyle(myTest), 'right');
-  equal(table.children[0].children[0].children[3].children[2].style.clear,
-    'both');
+  strictEqual(headRow.children[0].style.padding, '5px');
+  strictEqual(headRow.children[1].style.padding, '5px');
+  strictEqual(headRow.children[2].style.padding, '5px');
+  strictEqual(headRow.children[3].style.padding, '5px');
+  myTest = headRow.children[0].children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[0].children[1].style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(headRow.children[0].children[2].style.clear, 'both');
+  myTest = headRow.children[1].children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[1].children[1].style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(headRow.children[1].children[2].style.clear, 'both');
+  myTest = headRow.children[2].children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[2].children[1].style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(headRow.children[2].children[2].style.clear, 'both');
+  myTest = headRow.children[3].children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[3].children[1].style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(headRow.children[3].children[2].style.clear, 'both');
   // different from default
-  equal(table.children[1].children[0].style.backgroundColor, '');
-  equal(table.children[1].children[1].style.backgroundColor, '');
-  equal(table.children[1].children[2].style.backgroundColor, '');
-  equal(table.children[1].children[3].style.backgroundColor, '');
-  equal(table.children[1].children[4].style.backgroundColor, '');
-  equal(table.children[1].children[5].style.backgroundColor, '');
-  equal(table.children[1].children[6].style.backgroundColor, '');
-  equal(table.children[1].children[7].style.backgroundColor, '');
-  equal(table.children[1].children[8].style.backgroundColor, '');
-  equal(table.children[1].children[9].style.backgroundColor, '');
+  strictEqual(tbody.children[0].style.backgroundColor, '');
+  strictEqual(tbody.children[1].style.backgroundColor, '');
+  strictEqual(tbody.children[2].style.backgroundColor, '');
+  strictEqual(tbody.children[3].style.backgroundColor, '');
+  strictEqual(tbody.children[4].style.backgroundColor, '');
+  strictEqual(tbody.children[5].style.backgroundColor, '');
+  strictEqual(tbody.children[6].style.backgroundColor, '');
+  strictEqual(tbody.children[7].style.backgroundColor, '');
+  strictEqual(tbody.children[8].style.backgroundColor, '');
+  strictEqual(tbody.children[9].style.backgroundColor, '');
   // /different
-  equal(table.children[1].children[0].children[0].style.padding, '5px');
-  equal(table.children[1].children[0].children[1].style.padding, '5px');
-  equal(table.children[1].children[0].children[2].style.padding, '5px');
-  equal(table.children[1].children[0].children[3].style.padding, '5px');
+  strictEqual(tbody.children[0].children[0].style.padding, '5px');
+  strictEqual(tbody.children[0].children[1].style.padding, '5px');
+  strictEqual(tbody.children[0].children[2].style.padding, '5px');
+  strictEqual(tbody.children[0].children[3].style.padding, '5px');
   //Classes
   // different from default
-  equal(footer.children[1].children[0].className, 'btn btn-default table-page');
-  equal(footer.children[1].children[1].className, 'btn btn-default table-page');
-  equal(table.children[0].children[0].children[0].children[1].className,
-    'table-sort');
-  equal(table.children[0].children[0].children[1].children[1].className,
-    'table-sort');
-  equal(table.children[0].children[0].children[2].children[1].className,
-    'table-sort');
-  equal(table.children[0].children[0].children[3].children[1].className,
-    'table-sort');
+  strictEqual(footer.children[1].children[0].className,
+    'btn btn-default table-page');
+  strictEqual(footer.children[1].children[1].className,
+    'btn btn-default table-page');
+  strictEqual(headRow.children[0].children[1].className, 'table-sort');
+  strictEqual(headRow.children[1].children[1].className, 'table-sort');
+  strictEqual(headRow.children[2].children[1].className, 'table-sort');
+  strictEqual(headRow.children[3].children[1].className, 'table-sort');
   // /different
-  equal(table.children[1].children[0].className, 'table-row-even');
-  equal(table.children[1].children[1].className, 'table-row-odd');
-  equal(table.children[1].children[2].className, 'table-row-even');
-  equal(table.children[1].children[3].className, 'table-row-odd');
-  equal(table.children[1].children[4].className, 'table-row-even');
-  equal(table.children[1].children[5].className, 'table-row-odd');
-  equal(table.children[1].children[6].className, 'table-row-even');
-  equal(table.children[1].children[7].className, 'table-row-odd');
-  equal(table.children[1].children[8].className, 'table-row-even');
-  equal(table.children[1].children[9].className, 'table-row-odd');
+  strictEqual(tbody.children[0].className, 'table-row-even');
+  strictEqual(tbody.children[1].className, 'table-row-odd');
+  strictEqual(tbody.children[2].className, 'table-row-even');
+  strictEqual(tbody.children[3].className, 'table-row-odd');
+  strictEqual(tbody.children[4].className, 'table-row-even');
+  strictEqual(tbody.children[5].className, 'table-row-odd');
+  strictEqual(tbody.children[6].className, 'table-row-even');
+  strictEqual(tbody.children[7].className, 'table-row-odd');
+  strictEqual(tbody.children[8].className, 'table-row-even');
+  strictEqual(tbody.children[9].className, 'table-row-odd');
   //State
-  equal(footer.children[1].children[0].getAttribute('disabled'), 'disabled');
+  strictEqual(footer.children[1].children[0].getAttribute('disabled'),
+    'disabled');
+});
+test('Dable with style="JqueryUI" has basic elements and slightly ' +
+    'different styling and classes', function() {
+  //Given: a table
+  document.body.appendChild(testDiv);
+  makeSimpleTable(testDiv);
+
+  //When: we make it a dable
+  var dable = new Dable(testDiv.id);
+  dable.style = 'JqueryUI';
+  dable.UpdateStyle();
+
+  //Then: we see the elements we expect
+  //Element pattern
+  strictEqual(testDiv.children.length, 3);
+  var header = testDiv.children[0];
+  var pager = header.children[0];
+  var pageSelect = pager.children[1];
+  var search = header.children[1];
+  var table = testDiv.querySelector('table');
+  var headRow = table.children[0].children[0];
+  var tbody = table.children[1];
+  var footer = testDiv.children[2];
+  strictEqual(header.children.length, 3);
+  strictEqual(pager.children.length, 2);
+  strictEqual(pager.children[0].children.length, 0);
+  strictEqual(pageSelect.children.length, 4);
+  strictEqual(pageSelect.children[0].children.length, 0);
+  strictEqual(pageSelect.children[1].children.length, 0);
+  strictEqual(pageSelect.children[2].children.length, 0);
+  strictEqual(pageSelect.children[3].children.length, 0);
+  strictEqual(search.children.length, 2);
+  strictEqual(search.children[0].children.length, 0);
+  strictEqual(search.children[1].children.length, 0);
+  strictEqual(header.children[2].children.length, 0);
+  strictEqual(footer.children.length, 3);
+  strictEqual(footer.children[0].children.length, 1);
+  strictEqual(footer.children[0].children[0].children.length, 0);
+  strictEqual(footer.children[1].children.length, 2);
+  strictEqual(footer.children[1].children[0].children.length, 1);
+  strictEqual(footer.children[1].children[0].children[0].children.length, 0);
+  strictEqual(footer.children[1].children[1].children[0].children.length, 0);
+  strictEqual(footer.children[2].children.length, 0);
+  strictEqual(table.children.length, 2);
+  strictEqual(table.children[0].children.length, 1);
+  strictEqual(headRow.children.length, 4);
+  strictEqual(headRow.children[0].children.length, 3);
+  strictEqual(headRow.children[1].children.length, 3);
+  strictEqual(headRow.children[2].children.length, 3);
+  strictEqual(headRow.children[3].children.length, 3);
+  strictEqual(headRow.children[0].children[0].children.length, 0);
+  strictEqual(headRow.children[1].children[0].children.length, 0);
+  strictEqual(headRow.children[2].children[0].children.length, 0);
+  strictEqual(headRow.children[3].children[0].children.length, 0);
+  strictEqual(headRow.children[0].children[1].children.length, 0);
+  strictEqual(headRow.children[1].children[1].children.length, 0);
+  strictEqual(headRow.children[2].children[1].children.length, 0);
+  strictEqual(headRow.children[3].children[1].children.length, 0);
+  strictEqual(headRow.children[0].children[2].children.length, 0);
+  strictEqual(headRow.children[1].children[2].children.length, 0);
+  strictEqual(headRow.children[2].children[2].children.length, 0);
+  strictEqual(headRow.children[3].children[2].children.length, 0);
+  strictEqual(tbody.children.length, 10);
+  strictEqual(tbody.children[0].children.length, 4);
+  strictEqual(tbody.children[0].children[0].children.length, 0);
+  strictEqual(tbody.children[0].children[1].children.length, 0);
+  strictEqual(tbody.children[0].children[2].children.length, 0);
+  strictEqual(tbody.children[0].children[3].children.length, 0);
+  //IDs
+  strictEqual(header.id, testDiv.id + '_header');
+  strictEqual(footer.id, testDiv.id + '_footer');
+  strictEqual(search.children[1].id, testDiv.id + '_search');
+  strictEqual(footer.children[0].children[0].id, testDiv.id + '_showing');
+  strictEqual(footer.children[1].children[0].id, testDiv.id + '_page_prev');
+  strictEqual(footer.children[1].children[1].id, testDiv.id + '_page_next');
+  strictEqual(tbody.id, testDiv.id + '_body');
+  //Text
+  strictEqual(pager.children[0].innerHTML, 'Show ');
+  strictEqual(search.children[0].innerHTML, 'Search ');
+  strictEqual(footer.children[0].children[0].innerHTML,
+    'Showing 1 to 10 of 20 entries');
+  strictEqual(pageSelect.children[0].innerHTML, '10');
+  strictEqual(pageSelect.children[1].innerHTML, '25');
+  strictEqual(pageSelect.children[2].innerHTML, '50');
+  strictEqual(pageSelect.children[3].innerHTML, '100');
+  // different from default
+  strictEqual(footer.children[1].children[0].children[0].innerHTML, '');
+  strictEqual(footer.children[1].children[1].children[0].innerHTML, '');
+  // /different
+  strictEqual(headRow.children[0].children[0].innerHTML, 'Column 0 ');
+  strictEqual(headRow.children[1].children[0].innerHTML, 'Column 1 ');
+  strictEqual(headRow.children[2].children[0].innerHTML, 'Column 2 ');
+  strictEqual(headRow.children[3].children[0].innerHTML, 'Column 3 ');
+  strictEqual(tbody.children[0].children[0].innerHTML, '0');
+  strictEqual(tbody.children[0].children[1].innerHTML, '1');
+  strictEqual(tbody.children[0].children[2].innerHTML, '2');
+  strictEqual(tbody.children[0].children[3].innerHTML, '3');
+  //Values
+  strictEqual(pageSelect.children[0].value, '10');
+  strictEqual(pageSelect.children[1].value, '25');
+  strictEqual(pageSelect.children[2].value, '50');
+  strictEqual(pageSelect.children[3].value, '100');
+  //Styles
+  strictEqual(table.style.width, '100%');
+  strictEqual(header.style.padding, '5px');
+  strictEqual(footer.style.padding, '5px');
+  var myTest = pager.style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = search.style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(header.children[2].style.clear, 'both');
+  myTest = footer.children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = footer.children[1].style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(footer.children[1].style.listStyleType, 'none');
+  strictEqual(footer.children[2].style.clear, 'both');
+  // different from default
+  strictEqual(footer.children[1].children[0].style.display, '');
+  strictEqual(footer.children[1].children[1].style.display, '');
+  strictEqual(footer.children[1].children[0].style.marginRight, '');
+  strictEqual(footer.children[1].children[1].style.marginRight, '');
+  // /different
+  strictEqual(headRow.children[0].style.padding, '5px');
+  strictEqual(headRow.children[1].style.padding, '5px');
+  strictEqual(headRow.children[2].style.padding, '5px');
+  strictEqual(headRow.children[3].style.padding, '5px');
+  myTest = headRow.children[0].children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[0].children[1].style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(headRow.children[0].children[2].style.clear, 'both');
+  myTest = headRow.children[1].children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[1].children[1].style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(headRow.children[1].children[2].style.clear, 'both');
+  myTest = headRow.children[2].children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[2].children[1].style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(headRow.children[2].children[2].style.clear, 'both');
+  myTest = headRow.children[3].children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[3].children[1].style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(headRow.children[3].children[2].style.clear, 'both');
+  // different from default
+  strictEqual(rgb2hex(tbody.children[0].style.backgroundColor), '#e2e4ff');
+  strictEqual(tbody.children[1].style.backgroundColor, 'white');
+  strictEqual(rgb2hex(tbody.children[2].style.backgroundColor), '#e2e4ff');
+  strictEqual(tbody.children[3].style.backgroundColor, 'white');
+  strictEqual(rgb2hex(tbody.children[4].style.backgroundColor), '#e2e4ff');
+  strictEqual(tbody.children[5].style.backgroundColor, 'white');
+  strictEqual(rgb2hex(tbody.children[6].style.backgroundColor), '#e2e4ff');
+  strictEqual(tbody.children[7].style.backgroundColor, 'white');
+  strictEqual(rgb2hex(tbody.children[8].style.backgroundColor), '#e2e4ff');
+  strictEqual(tbody.children[9].style.backgroundColor, 'white');
+  // /different
+  strictEqual(tbody.children[0].children[0].style.padding, '5px');
+  strictEqual(tbody.children[0].children[1].style.padding, '5px');
+  strictEqual(tbody.children[0].children[2].style.padding, '5px');
+  strictEqual(tbody.children[0].children[3].style.padding, '5px');
+  //Classes
+  // different from default
+  strictEqual(footer.children[1].children[0].className,
+    'fg-button ui-button ui-state-default ' +
+    'ui-corner-left table-page ui-state-disabled');
+  strictEqual(footer.children[1].children[1].className,
+    'fg-button ui-button ui-state-default ui-corner-left table-page');
+  strictEqual(headRow.children[0].children[1].className, 'table-sort');
+  strictEqual(headRow.children[1].children[1].className, 'table-sort');
+  strictEqual(headRow.children[2].children[1].className, 'table-sort');
+  strictEqual(headRow.children[3].children[1].className, 'table-sort');
+  // /different
+  strictEqual(tbody.children[0].className, 'table-row-even');
+  strictEqual(tbody.children[1].className, 'table-row-odd');
+  strictEqual(tbody.children[2].className, 'table-row-even');
+  strictEqual(tbody.children[3].className, 'table-row-odd');
+  strictEqual(tbody.children[4].className, 'table-row-even');
+  strictEqual(tbody.children[5].className, 'table-row-odd');
+  strictEqual(tbody.children[6].className, 'table-row-even');
+  strictEqual(tbody.children[7].className, 'table-row-odd');
+  strictEqual(tbody.children[8].className, 'table-row-even');
+  strictEqual(tbody.children[9].className, 'table-row-odd');
+  //State
+  strictEqual(footer.children[1].children[0].getAttribute('disabled'),
+    'disabled');
 });
 
 module('Function Counts');
@@ -859,8 +1038,8 @@ test('Creating an Dable from Data', function() {
   dable.BuildAll(testDiv.id);
 
   //Then: We get the mock only called once
-  equal(dable.UpdateDisplayedRows.callCount, 1);
-  equal(dable.UpdateStyle.callCount, 1);
+  strictEqual(dable.UpdateDisplayedRows.callCount, 1);
+  strictEqual(dable.UpdateStyle.callCount, 1);
 });
 test('Creating a Dable from a table', function() {
   //Given: a spy on UpdateDisplayedRows, an empty dable, and a table full of data
@@ -873,8 +1052,8 @@ test('Creating a Dable from a table', function() {
   dable.BuildAll(testDiv.id);
 
   //Then: we get the mock only called once
-  equal(dable.UpdateDisplayedRows.callCount, 1);
-  equal(dable.UpdateStyle.callCount, 1);
+  strictEqual(dable.UpdateDisplayedRows.callCount, 1);
+  strictEqual(dable.UpdateStyle.callCount, 1);
 });
 test('Calling UpdateStyle', function() {
   //Given: a spy on UpdateDisplayedRows, and a dable built from a table
@@ -887,7 +1066,7 @@ test('Calling UpdateStyle', function() {
   dable.UpdateStyle();
 
   //Then: the mock is never called
-  equal(dable.UpdateDisplayedRows.callCount, 0);
+  strictEqual(dable.UpdateDisplayedRows.callCount, 0);
 });
 test('Calling UpdateDisplayedRows', function() {
   //Given: a spy on UpdateStyle, and a dable built from a table
@@ -900,7 +1079,7 @@ test('Calling UpdateDisplayedRows', function() {
   dable.UpdateDisplayedRows();
 
   //Then: the mock is never called
-  equal(dable.UpdateStyle.callCount, 0);
+  strictEqual(dable.UpdateStyle.callCount, 0);
 });
 
 module('Public Function Tests');
@@ -914,7 +1093,7 @@ test('Dable Exists() returns true if Dable Exists', function() {
   var result = dable.Exists();
 
   //Then: we should get "true"
-  equal(result, true);
+  ok(result);
 });
 test('Dable Exists() returns false if Dable doesnt exist', function() {
   //Given: an unbuilt dable
@@ -924,8 +1103,78 @@ test('Dable Exists() returns false if Dable doesnt exist', function() {
   var result = dable.Exists();
 
   //Then: we should get "false"
-  equal(result, false);
+  notOk(result);
 });
+test('Dable Exists(testDiv) returns true if Dable Exists', function() {
+  //Given: a dable
+  var dable = new Dable();
+  makeSimpleTable(testDiv);
+  dable.BuildAll(testDiv.id);
+
+  //When: we call dable.Exists()
+  var result = dable.Exists(testDiv);
+
+  //Then: we should get "true"
+  ok(result);
+});
+test('Dable Exists(testDiv) returns false if Dable doesnt exist', function() {
+  //Given: an unbuilt dable
+  var dable = new Dable();
+
+  //When: we call dable.Exists()
+  var result = dable.Exists(testDiv);
+
+  //Then: we should get "false"
+  notOk(result);
+});
+test('Dable Exists($(testDiv)) returns true if Dable Exists', function() {
+  //Given: a dable
+  var dable = new Dable();
+  makeSimpleTable(testDiv);
+  dable.BuildAll(testDiv.id);
+
+  //When: we call dable.Exists()
+  var result = dable.Exists($(testDiv));
+
+  //Then: we should get "true"
+  ok(result);
+});
+test('Dable Exists($(testDiv)) returns false if Dable doesnt exist',
+  function() {
+    //Given: an unbuilt dable
+    var dable = new Dable();
+
+    //When: we call dable.Exists()
+    var result = dable.Exists($(testDiv));
+
+    //Then: we should get "false"
+    notOk(result);
+  }
+);
+test('Dable Exists(testDiv.id) returns true if Dable Exists', function() {
+  //Given: a dable
+  var dable = new Dable();
+  makeSimpleTable(testDiv);
+  dable.BuildAll(testDiv.id);
+
+  //When: we call dable.Exists()
+  var result = dable.Exists(testDiv.id);
+
+  //Then: we should get "true"
+  ok(result);
+});
+test('Dable Exists(testDiv.id) returns false if Dable doesnt exist',
+  function() {
+    //Given: an unbuilt dable
+    var dable = new Dable();
+
+    //When: we call dable.Exists()
+    var result = dable.Exists(testDiv.id);
+
+    //Then: we should get "false"
+    notOk(result);
+  }
+);
 
 module('Header Tests');
 test('Preselected Page Size Populates in the UI', function() {
@@ -941,7 +1190,8 @@ test('Preselected Page Size Populates in the UI', function() {
   //Then: the dropdown value equals the selected page size
   var header = document.getElementById(testDiv.id + '_header');
   var pageSizeDropDown = header.querySelector('select');
-  equal(pageSizeDropDown.options[pageSizeDropDown.selectedIndex].value,
+  strictEqual(Number(
+    pageSizeDropDown.options[pageSizeDropDown.selectedIndex].value),
     selectedPageSize);
 });
 
@@ -968,9 +1218,33 @@ test('With no thead the dable is not created', function() {
   //When: we build the dable
   dable.BuildAll(testDiv.id);
 
+  //Then: we output an error message to the console
+  strictEqual(consoleOutput, 'Dable Error: No thead element in table',
+    'Output correct message to console.error');
+
   //Then: the dable doesn't exist
   // var dableHeader = document.getElementById(testDiv.id + '_header');
-  equal(dable.Exists(), false);
+  notOk(dable.Exists(), 'the dable doesn\'t exist');
+});
+test('Creating a Dable from a jQuery table', function() {
+  //Given: a table
+  makeSimpleTable(testDiv);
+
+  //When: we build the Dable
+  // eslint-disable-next-line no-unused-vars
+  var dable = new Dable($(testDiv)); // jshint ignore:line
+
+  //Then: we see the elements we expect
+  //Element pattern
+  strictEqual(testDiv.children.length, 3);
+  var table = testDiv.querySelector('table');
+  var footer = testDiv.children[2];
+  strictEqual(footer.children[0].children[0].innerHTML,
+    'Showing 1 to 10 of 20 entries');
+  strictEqual(table.children[1].children[0].children[0].innerHTML, '0');
+  strictEqual(table.children[1].children[0].children[1].innerHTML, '1');
+  strictEqual(table.children[1].children[0].children[2].innerHTML, '2');
+  strictEqual(table.children[1].children[0].children[3].innerHTML, '3');
 });
 
 module('Dable from nested HTML Tests');
@@ -984,19 +1258,19 @@ test('basic Dable from nested HTML looks right', function() {
 
   //Then: we see the elements we expect
   //Element pattern
-  equal(innerDiv.children.length, 3);
+  strictEqual(innerDiv.children.length, 3);
   var table = innerDiv.querySelector('table');
   var footer = innerDiv.children[2];
-  equal(footer.children[0].children[0].innerHTML,
+  strictEqual(footer.children[0].children[0].innerHTML,
     'Showing 1 to 10 of 20 entries');
-  equal(table.children[1].children[0].children[0].innerHTML, 0);
-  equal(table.children[1].children[0].children[1].innerHTML, 1);
-  equal(table.children[1].children[0].children[2].innerHTML, 2);
-  equal(table.children[1].children[0].children[3].innerHTML, 3);
+  strictEqual(table.children[1].children[0].children[0].innerHTML, '0');
+  strictEqual(table.children[1].children[0].children[1].innerHTML, '1');
+  strictEqual(table.children[1].children[0].children[2].innerHTML, '2');
+  strictEqual(table.children[1].children[0].children[3].innerHTML, '3');
 });
 
 module('Event Tests');
-test('basic Dable ascending sort', function() {
+test('basic Dable integer ascending sort', function() {
   //Given: a table
   makeSimpleTable(testDiv);
 
@@ -1004,14 +1278,14 @@ test('basic Dable ascending sort', function() {
   // eslint-disable-next-line no-unused-vars
   var dable = new Dable(testDiv); // jshint ignore:line
   var table = testDiv.querySelector('table');
-  table.children[0].children[0].children[0].children[0].click();
+  var theadRow = table.children[0].children[0];
+  theadRow.children[0].children[0].click();
 
   //Then: we see the elements we expect
-  equal(table.children[0].children[0].children[0].children[1].innerText
-    .charCodeAt(0), 9650);
-  equal(table.children[1].children[0].children[0].innerText, '0');
+  strictEqual(theadRow.children[0].children[1].innerText.charCodeAt(0), 9650);
+  strictEqual(table.children[1].children[0].children[0].innerText, '0');
 });
-test('basic Dable decending sort', function() {
+test('basic Dable integer decending sort', function() {
   //Given: a table
   makeSimpleTable(testDiv);
 
@@ -1019,13 +1293,13 @@ test('basic Dable decending sort', function() {
   // eslint-disable-next-line no-unused-vars
   var dable = new Dable(testDiv); // jshint ignore:line
   var table = testDiv.querySelector('table');
-  table.children[0].children[0].children[0].children[0].click();
-  table.children[0].children[0].children[0].children[0].click();
+  var theadRow = table.children[0].children[0];
+  theadRow.children[0].children[0].click();
+  theadRow.children[0].children[0].click();
 
   //Then: we see the elements we expect
-  equal(table.children[0].children[0].children[0].children[1].innerText
-    .charCodeAt(0), 9660);
-  equal(table.children[1].children[0].children[0].innerText, '19');
+  strictEqual(theadRow.children[0].children[1].innerText.charCodeAt(0), 9660);
+  strictEqual(table.children[1].children[0].children[0].innerText, '19');
 });
 test('basic Dable search filter', function() {
   //Given: a table
@@ -1040,7 +1314,7 @@ test('basic Dable search filter', function() {
   triggerEvent(search, 'keyup');
 
   //Then: we see the elements we expect
-  equal(table.children[1].children[0].children[0].innerText, '8');
+  strictEqual(table.children[1].children[0].children[0].innerText, '8');
 });
 test('Ascending sort column 2 with sort disabled column 1', function() {
   //Given: a Dable with sorting turned off on column 1
@@ -1051,10 +1325,49 @@ test('Ascending sort column 2 with sort disabled column 1', function() {
 
   //When: we click on second header
   var table = testDiv.querySelector('table');
-  table.children[0].children[0].children[1].children[0].click();
+  var theadRow = table.children[0].children[0];
+  theadRow.children[1].children[0].click();
 
   //Then: we see the elements we expect
-  equal(table.children[0].children[0].children[1].children[1].innerText
-    .charCodeAt(0), 9650);
-  equal(table.children[1].children[0].children[1].innerText, '1');
+  strictEqual(theadRow.children[1].children[1].innerText.charCodeAt(0), 9650);
+  strictEqual(table.children[1].children[0].children[1].innerText, '1');
+});
+test('basic Dable US dates ascending sort', function() {
+  //Given: a Dable
+  makeCustomDable(testDiv);
+
+  //When: we click on a header
+  var table = testDiv.querySelector('table');
+  var theadRow = table.children[0].children[0];
+  theadRow.children[1].click();
+
+  //Then: we see the elements we expect
+  strictEqual(theadRow.children[1].children[1].innerText.charCodeAt(0), 9650);
+  strictEqual(table.children[1].children[0].children[1].innerText, '1/1/2001');
+});
+test('basic Dable lexicographic ascending sort', function() {
+  //Given: a Dable
+  makeCustomDable(testDiv);
+
+  //When: we click on a header
+  var table = testDiv.querySelector('table');
+  var theadRow = table.children[0].children[0];
+  theadRow.children[2].click();
+
+  //Then: we see the elements we expect
+  strictEqual(theadRow.children[2].children[1].innerText.charCodeAt(0), 9650);
+  strictEqual(table.children[1].children[0].children[2].innerText, 'Cat');
+});
+test('basic Dable custom ascending sort', function() {
+  //Given: a Dable
+  makeCustomDable(testDiv);
+
+  //When: we click on a header
+  var table = testDiv.querySelector('table');
+  var theadRow = table.children[0].children[0];
+  theadRow.children[3].click();
+
+  //Then: we see the elements we expect
+  strictEqual(theadRow.children[3].children[1].innerText.charCodeAt(0), 9650);
+  strictEqual(table.children[1].children[0].children[3].innerText, 'First');
 });
