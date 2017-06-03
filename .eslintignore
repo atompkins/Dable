@@ -1,6 +1,5 @@
 **/*{.,-}min.js
-coverage/lcov-report/**
-coverage/dable.test.js
+coverage
 ie8
 lib
 node_modules/

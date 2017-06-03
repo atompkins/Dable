@@ -1,6 +1,6 @@
 var qunit = require('node-qunit-phantomjs');
 
-qunit('./coverage/cover.html', {
-  customRunner: './coverage/runner.js',
+qunit('./test/test.html', {
+  customRunner: './test/runner.js',
   page: {coverageLocation: './coverage/coverage.json'}
 });
