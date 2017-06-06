@@ -19,12 +19,13 @@ export default function(columnCell) {
       return false;
     }
 
-    this.sortColumn = columnIndex;
-    var ascend = false;
-    if (this.sortOrder.length > 3 &&
-        this.sortOrder.substr(0, 4).toLowerCase() == 'desc') {
-      ascend = true; //switching from descending to ascending
+    var ascend = true;
+    if (this.sortColumn === columnIndex &&
+        this.sortOrder.length === 3 &&
+        this.sortOrder.toLowerCase() == 'asc') {
+      ascend = false;
     }
+    this.sortColumn = columnIndex;
 
     if (ascend) {
       this.sortOrder = 'asc';

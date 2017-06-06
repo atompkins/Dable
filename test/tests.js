@@ -147,12 +147,13 @@ function customSortFn(columnIndex, ascending, currentRowObjects) {
 function makeCustomDable(testDiv) {
   var dable = new Dable();
   var data = [
-    [1, '12/1/12', 'Porcupine', 'Second'],
-    [2, '12/2/2012', 'Cat', 'Fourth'],
-    [3, '1/1/2001', 'bat', 'First'],
-    [4, '2/22/02', 'Zebra', 'Third']
+    [1, '12/2/12', 'Porcupine', 'Second', '40 Tom'],
+    [2, '12/1/2012', 'Cat', 'Fourth', '20 Dick'],
+    [3, '1/1/2001', 'bat', 'First', '50 Harry'],
+    [4, '2/22/02', 'Zebra', 'Third', '10 Bob'],
+    [4, '2/22/02', 'Zebra', 'Third', '30 Sally']
   ];
-  var columns = ['Numbers', 'Dates', 'Text', 'Custom'];
+  var columns = ['Numbers', 'Dates', 'Text', 'Custom', 'Mixed'];
   dable.SetDataAsRows(data);
   dable.SetColumnNames(columns);
   dable.columnData[3].CustomSortFunc = customSortFn;
@@ -176,10 +177,10 @@ function makePagerDable(testDiv) {
   return dable;
 }
 
-var consoleOutput;
+var consoleErrorOutput;
 if (!console) {console = {};}
 console.error = function() {
-  consoleOutput = arguments[0];
+  consoleErrorOutput = arguments[0];
 };
 
 var testDiv = document.getElementById('qunit-fixture');
@@ -201,32 +202,36 @@ test('Dable defaults are empty, not null', function() {
   notStrictEqual(dable.id, null, 'ID is not null');
   strictEqual(dable.id, '', 'ID is empty');
   notStrictEqual(dable.columns, null, 'Columns is not null');
-  ok(dable.columns instanceof Array, 'Columns is an Array');
+  strictEqual(dable.columns instanceof Array, true, 'Columns is an Array');
   strictEqual(dable.columns.length, 0, 'Columns is empty');
   notStrictEqual(dable.columnData, null, 'ColumnData is not null');
-  ok(dable.columnData instanceof Array, 'ColumnData is an Array');
+  strictEqual(dable.columnData instanceof Array, true,
+    'ColumnData is an Array');
   strictEqual(dable.columnData.length, 0, 'ColumnData is empty');
   notStrictEqual(dable.rows, null, 'Rows is not null');
-  ok(dable.rows instanceof Array, 'Rows is an Array');
+  strictEqual(dable.rows instanceof Array, true, 'Rows is an Array');
   strictEqual(dable.rows.length, 0, 'Rows is empty');
   notStrictEqual(dable.rowObjects, null, 'RowObjects is not null');
-  ok(dable.rowObjects instanceof Array, 'RowObjects is an Array');
+  strictEqual(dable.rowObjects instanceof Array, true,
+    'RowObjects is an Array');
   strictEqual(dable.rowObjects.length, 0, 'RowObjects is empty');
   notStrictEqual(dable.hiddenColumns, null, 'HiddenColumns is not null');
-  ok(dable.hiddenColumns instanceof Array, 'HiddenColumns is an Array');
+  strictEqual(dable.hiddenColumns instanceof Array, true,
+    'HiddenColumns is an Array');
   strictEqual(dable.hiddenColumns.length, 0, 'HiddenColumns is empty');
   notStrictEqual(dable.filters, null, 'Filters is not null');
-  ok(dable.filters instanceof Array, 'Filters is an Array');
+  strictEqual(dable.filters instanceof Array, true, 'Filters is an Array');
   strictEqual(dable.filters.length, 2,
     'Filters contains the 2 default filters');
   notStrictEqual(dable.pageSizes, null, 'PageSizes is not null');
-  ok(dable.pageSizes instanceof Array, 'PageSizes is an Array');
+  strictEqual(dable.pageSizes instanceof Array, true, 'PageSizes is an Array');
   strictEqual(dable.pageSizes.length, 4,
     'PageSizes contains the 4 default page sizes');
   notStrictEqual(dable.async, null, 'Async is not null');
   strictEqual(dable.async, false, 'Async is false');
   notStrictEqual(dable.asyncData, null, 'AsyncData is not null');
-  ok(dable.asyncData instanceof Object, 'AsyncData is an object');
+  strictEqual(dable.asyncData instanceof Object, true,
+    'AsyncData is an object');
   strictEqual(Object.keys(dable.asyncData).length, 0,
     'AsyncData has no properties');
   notStrictEqual(dable.asyncLength, null, 'AsyncLength is not null');
@@ -284,6 +289,19 @@ test('Dable defaults are empty, not null', function() {
   strictEqual(dable.tableClass, '', 'TableClass is empty');
   notStrictEqual(dable.tfoothtml, null, 'TFootHtml is not null');
   strictEqual(dable.tfoothtml, '', 'TFootHtml is empty');
+  strictEqual(dable.ApplyBootstrapStyles(), false,
+    'ApplyBootstrapStyles return false');
+  strictEqual(dable.ApplyJqueryUIStyles(), false,
+    'ApplyJqueryUIStyles return false');
+  strictEqual(dable.BuildFooter(), false, 'BuildFooter return false');
+  strictEqual(dable.BuildHeader(), false, 'BuildHeader return false');
+  strictEqual(dable.BuildTable(), false, 'BuildTable return false');
+  strictEqual(dable.searchFunc({id: 'test'}), false, 'searchFunc return false');
+  strictEqual(dable.SetColumnNames(), false, 'SetColumnNames returns false');
+  strictEqual(dable.SetDataAsRows(), false, 'SetDataAsRows return false');
+  strictEqual(dable.UpdateDisplayedRows(), false,
+    'UpdateDisplayedRows return false');
+  strictEqual(dable.UpdateStyle(), false, 'UpdateStyle return false');
 });
 
 module('Pager Tests');
@@ -314,84 +332,6 @@ test('Dable Pager goes backward', function() {
   //Then: we see the first page
   strictEqual(dable.pageNumber, 0, 'Current page is 0');
   strictEqual(firstCell.innerHTML, '0', 'First cell contains 0');
-});
-test('Dable multi page Pager looks right', function() {
-  //Given: a Dable with a multi page Pager
-  makePagerDable(testDiv);
-
-  //Then: it looks right
-  var pager = testDiv.children[2].children[1];
-  //Element pattern
-  strictEqual(pager.children.length, 9, 'Pager has 9 elements');
-  strictEqual(pager.children[0].children.length, 1,
-    'First element has one child');
-  strictEqual(pager.children[1].children.length, 1,
-    'Second element has one child');
-  strictEqual(pager.children[2].children.length, 1,
-    'Third element has one child');
-  strictEqual(pager.children[3].children.length, 1,
-    'Fourth element has one child');
-  strictEqual(pager.children[4].children.length, 1,
-    'Fifth element has one child');
-  strictEqual(pager.children[5].children.length, 1,
-    'Sixth element has one child');
-  strictEqual(pager.children[6].children.length, 1,
-    'Seventh element has one child');
-  strictEqual(pager.children[7].children.length, 1,
-    'Eighth element has one child');
-  strictEqual(pager.children[8].children.length, 1,
-    'Ninth element has one child');
-  strictEqual(pager.children[0].children[0].children.length, 0,
-    'First element child has no decendants');
-  strictEqual(pager.children[1].children[0].children.length, 0,
-    'Second element child has no decendants');
-  strictEqual(pager.children[2].children[0].children.length, 0,
-    'Third element child has no decendants');
-  strictEqual(pager.children[3].children[0].children.length, 0,
-    'Fourth element child has no decendants');
-  strictEqual(pager.children[4].children[0].children.length, 0,
-    'Fifth element child has no decendants');
-  strictEqual(pager.children[5].children[0].children.length, 0,
-    'Sixth element child has no decendants');
-  strictEqual(pager.children[6].children[0].children.length, 0,
-    'Seventh element child has no decendants');
-  strictEqual(pager.children[7].children[0].children.length, 0,
-    'Eighth element child has no decendants');
-  strictEqual(pager.children[8].children[0].children.length, 0,
-    'Ninth element child has no decendants');
-  //IDs
-  strictEqual(pager.children[0].id, testDiv.id + '_page_first');
-  strictEqual(pager.children[1].id, testDiv.id + '_page_prev');
-  strictEqual(pager.children[2].id, '');
-  strictEqual(pager.children[3].id, '');
-  strictEqual(pager.children[4].id, '');
-  strictEqual(pager.children[5].id, '');
-  strictEqual(pager.children[6].id, '');
-  strictEqual(pager.children[7].id, testDiv.id + '_page_next');
-  strictEqual(pager.children[8].id, testDiv.id + '_page_last');
-  //Text
-  strictEqual(pager.children[0].children[0].innerHTML, 'First');
-  strictEqual(pager.children[1].children[0].innerHTML, 'Prev');
-  strictEqual(pager.children[2].children[0].innerHTML, '1');
-  strictEqual(pager.children[3].children[0].innerHTML, '2');
-  strictEqual(pager.children[4].children[0].innerHTML, '3');
-  strictEqual(pager.children[5].children[0].innerHTML, '4');
-  strictEqual(pager.children[6].children[0].innerHTML, '5');
-  strictEqual(pager.children[7].children[0].innerHTML, 'Next');
-  strictEqual(pager.children[8].children[0].innerHTML, 'Last');
-  //Attributes
-  strictEqual(pager.children[0].getAttribute('disabled'), 'disabled',
-    'First is disabled');
-  strictEqual(pager.children[1].getAttribute('disabled'), 'disabled',
-    'Prev is disabled');
-  strictEqual(pager.children[2].getAttribute('disabled'), 'disabled',
-    '1 is disabled');
-  notOk(pager.children[3].getAttribute('disabled'), '2 is not disabled');
-  notOk(pager.children[4].getAttribute('disabled'), '3 is not disabled');
-  notOk(pager.children[5].getAttribute('disabled'), '4 is not disabled');
-  notOk(pager.children[6].getAttribute('disabled'), '5 is not disabled');
-  notOk(pager.children[7].getAttribute('disabled'), 'Next is not disabled');
-  notOk(pager.children[8].getAttribute('disabled'), 'Last is not disabled');
 });
 test('Dable multi page Pager Last button works', function() {
   //Given: a Dable with a multi page Pager
@@ -499,16 +439,17 @@ test('Dable with style="none" has basic elements', function() {
   //Element pattern
   strictEqual(testDiv.children.length, 3);
   var header = testDiv.children[0];
-  var pager = header.children[0];
-  var pageSelect = pager.children[1];
+  var pageSize = header.children[0];
+  var pageSelect = pageSize.children[1];
   var search = header.children[1];
   var table = testDiv.querySelector('table');
   var headRow = table.children[0].children[0];
   var tbody = table.children[1];
   var footer = testDiv.children[2];
+  var pager = footer.children[1];
   strictEqual(header.children.length, 3);
-  strictEqual(pager.children.length, 2);
-  strictEqual(pager.children[0].children.length, 0);
+  strictEqual(pageSize.children.length, 2);
+  strictEqual(pageSize.children[0].children.length, 0);
   strictEqual(pageSelect.children.length, 4);
   strictEqual(pageSelect.children[0].children.length, 0);
   strictEqual(pageSelect.children[1].children.length, 0);
@@ -521,10 +462,11 @@ test('Dable with style="none" has basic elements', function() {
   strictEqual(footer.children.length, 3);
   strictEqual(footer.children[0].children.length, 1);
   strictEqual(footer.children[0].children[0].children.length, 0);
-  strictEqual(footer.children[1].children.length, 2);
-  strictEqual(footer.children[1].children[0].children.length, 1);
-  strictEqual(footer.children[1].children[0].children[0].children.length, 0);
-  strictEqual(footer.children[1].children[1].children[0].children.length, 0);
+  strictEqual(pager.children.length, 2);
+  strictEqual(pager.children[0].children.length, 1);
+  strictEqual(pager.children[0].children[0].children.length, 0);
+  strictEqual(pager.children[1].children.length, 1);
+  strictEqual(pager.children[1].children[0].children.length, 0);
   strictEqual(footer.children[2].children.length, 0);
   strictEqual(table.children.length, 2);
   strictEqual(table.children[0].children.length, 1);
@@ -556,11 +498,11 @@ test('Dable with style="none" has basic elements', function() {
   strictEqual(footer.id, testDiv.id + '_footer');
   strictEqual(search.children[1].id, testDiv.id + '_search');
   strictEqual(footer.children[0].children[0].id, testDiv.id + '_showing');
-  strictEqual(footer.children[1].children[0].id, testDiv.id + '_page_prev');
-  strictEqual(footer.children[1].children[1].id, testDiv.id + '_page_next');
+  strictEqual(pager.children[0].id, testDiv.id + '_page_prev');
+  strictEqual(pager.children[1].id, testDiv.id + '_page_next');
   strictEqual(tbody.id, testDiv.id + '_body');
   //Text
-  strictEqual(pager.children[0].innerHTML, 'Show ');
+  strictEqual(pageSize.children[0].innerHTML, 'Show ');
   strictEqual(search.children[0].innerHTML, 'Search ');
   strictEqual(footer.children[0].children[0].innerHTML,
     'Showing 1 to 10 of 20 entries');
@@ -568,8 +510,8 @@ test('Dable with style="none" has basic elements', function() {
   strictEqual(pageSelect.children[1].innerHTML, '25');
   strictEqual(pageSelect.children[2].innerHTML, '50');
   strictEqual(pageSelect.children[3].innerHTML, '100');
-  strictEqual(footer.children[1].children[0].children[0].innerHTML, 'Prev');
-  strictEqual(footer.children[1].children[1].children[0].innerHTML, 'Next');
+  strictEqual(pager.children[0].children[0].innerHTML, 'Prev');
+  strictEqual(pager.children[1].children[0].innerHTML, 'Next');
   strictEqual(headRow.children[0].children[0].innerHTML, 'Column 0 ');
   strictEqual(headRow.children[1].children[0].innerHTML, 'Column 1 ');
   strictEqual(headRow.children[2].children[0].innerHTML, 'Column 2 ');
@@ -587,21 +529,21 @@ test('Dable with style="none" has basic elements', function() {
   strictEqual(table.style.width, '100%');
   strictEqual(header.style.padding, '5px');
   strictEqual(footer.style.padding, '5px');
-  var myTest = pager.style;
+  var myTest = pageSize.style;
   strictEqual(floatStyle(myTest), 'left');
   myTest = search.style;
   strictEqual(floatStyle(myTest), 'right');
   strictEqual(header.children[2].style.clear, 'both');
   myTest = footer.children[0].style;
   strictEqual(floatStyle(myTest), 'left');
-  myTest = footer.children[1].style;
+  myTest = pager.style;
   strictEqual(floatStyle(myTest), 'right');
-  strictEqual(footer.children[1].style.listStyleType, 'none');
+  strictEqual(pager.style.listStyleType, 'none');
   strictEqual(footer.children[2].style.clear, 'both');
-  strictEqual(footer.children[1].children[0].style.display, 'inline');
-  strictEqual(footer.children[1].children[1].style.display, 'inline');
-  strictEqual(footer.children[1].children[0].style.marginRight, '5px');
-  strictEqual(footer.children[1].children[1].style.marginRight, '5px');
+  strictEqual(pager.children[0].style.display, 'inline');
+  strictEqual(pager.children[1].style.display, 'inline');
+  strictEqual(pager.children[0].style.marginRight, '5px');
+  strictEqual(pager.children[1].style.marginRight, '5px');
   strictEqual(headRow.children[0].style.padding, '5px');
   strictEqual(headRow.children[1].style.padding, '5px');
   strictEqual(headRow.children[2].style.padding, '5px');
@@ -641,8 +583,8 @@ test('Dable with style="none" has basic elements', function() {
   strictEqual(tbody.children[0].children[2].style.padding, '5px');
   strictEqual(tbody.children[0].children[3].style.padding, '5px');
   //Classes
-  strictEqual(footer.children[1].children[0].className, 'table-page');
-  strictEqual(footer.children[1].children[1].className, 'table-page');
+  strictEqual(pager.children[0].className, 'table-page');
+  strictEqual(pager.children[1].className, 'table-page');
   strictEqual(headRow.children[0].children[1].className, 'table-sort');
   strictEqual(headRow.children[1].children[1].className, 'table-sort');
   strictEqual(headRow.children[2].children[1].className, 'table-sort');
@@ -658,7 +600,7 @@ test('Dable with style="none" has basic elements', function() {
   strictEqual(tbody.children[8].className, 'table-row-even');
   strictEqual(tbody.children[9].className, 'table-row-odd');
   //State
-  strictEqual(footer.children[1].children[0].getAttribute('disabled'),
+  strictEqual(pager.children[0].getAttribute('disabled'),
     'disabled');
 });
 test('Dable with style="clear" has basic elements but no style', function() {
@@ -674,16 +616,17 @@ test('Dable with style="clear" has basic elements but no style', function() {
   //Element pattern
   strictEqual(testDiv.children.length, 3);
   var header = testDiv.children[0];
-  var pager = header.children[0];
-  var pageSelect = pager.children[1];
+  var pageSize = header.children[0];
+  var pageSelect = pageSize.children[1];
   var search = header.children[1];
   var table = testDiv.querySelector('table');
   var headRow = table.children[0].children[0];
   var tbody = table.children[1];
   var footer = testDiv.children[2];
+  var pager = footer.children[1];
   strictEqual(header.children.length, 3);
-  strictEqual(pager.children.length, 2);
-  strictEqual(pager.children[0].children.length, 0);
+  strictEqual(pageSize.children.length, 2);
+  strictEqual(pageSize.children[0].children.length, 0);
   strictEqual(pageSelect.children.length, 4);
   strictEqual(pageSelect.children[0].children.length, 0);
   strictEqual(pageSelect.children[1].children.length, 0);
@@ -696,10 +639,11 @@ test('Dable with style="clear" has basic elements but no style', function() {
   strictEqual(footer.children.length, 3);
   strictEqual(footer.children[0].children.length, 1);
   strictEqual(footer.children[0].children[0].children.length, 0);
-  strictEqual(footer.children[1].children.length, 2);
-  strictEqual(footer.children[1].children[0].children.length, 1);
-  strictEqual(footer.children[1].children[0].children[0].children.length, 0);
-  strictEqual(footer.children[1].children[1].children[0].children.length, 0);
+  strictEqual(pager.children.length, 2);
+  strictEqual(pager.children[0].children.length, 1);
+  strictEqual(pager.children[0].children[0].children.length, 0);
+  strictEqual(pager.children[1].children.length, 1);
+  strictEqual(pager.children[1].children[0].children.length, 0);
   strictEqual(footer.children[2].children.length, 0);
   strictEqual(table.children.length, 2);
   strictEqual(table.children[0].children.length, 1);
@@ -731,11 +675,11 @@ test('Dable with style="clear" has basic elements but no style', function() {
   strictEqual(footer.id, testDiv.id + '_footer');
   strictEqual(search.children[1].id, testDiv.id + '_search');
   strictEqual(footer.children[0].children[0].id, testDiv.id + '_showing');
-  strictEqual(footer.children[1].children[0].id, testDiv.id + '_page_prev');
-  strictEqual(footer.children[1].children[1].id, testDiv.id + '_page_next');
+  strictEqual(pager.children[0].id, testDiv.id + '_page_prev');
+  strictEqual(pager.children[1].id, testDiv.id + '_page_next');
   strictEqual(tbody.id, testDiv.id + '_body');
   //Text
-  strictEqual(pager.children[0].innerHTML, 'Show ');
+  strictEqual(pageSize.children[0].innerHTML, 'Show ');
   strictEqual(search.children[0].innerHTML, 'Search ');
   strictEqual(footer.children[0].children[0].innerHTML,
     'Showing 1 to 10 of 20 entries');
@@ -743,8 +687,8 @@ test('Dable with style="clear" has basic elements but no style', function() {
   strictEqual(pageSelect.children[1].innerHTML, '25');
   strictEqual(pageSelect.children[2].innerHTML, '50');
   strictEqual(pageSelect.children[3].innerHTML, '100');
-  strictEqual(footer.children[1].children[0].children[0].innerHTML, 'Prev');
-  strictEqual(footer.children[1].children[1].children[0].innerHTML, 'Next');
+  strictEqual(pager.children[0].children[0].innerHTML, 'Prev');
+  strictEqual(pager.children[1].children[0].innerHTML, 'Next');
   strictEqual(headRow.children[0].children[0].innerHTML, 'Column 0 ');
   strictEqual(headRow.children[1].children[0].innerHTML, 'Column 1 ');
   strictEqual(headRow.children[2].children[0].innerHTML, 'Column 2 ');
@@ -762,17 +706,17 @@ test('Dable with style="clear" has basic elements but no style', function() {
   strictEqual(table.style.width, '', 'table.style.width');
   strictEqual(header.style.padding, '');
   strictEqual(footer.style.padding, '');
-  strictEqual(floatStyle(pager.style), '', 'pager.style.float');
+  strictEqual(floatStyle(pageSize.style), '', 'pager.style.float');
   strictEqual(floatStyle(search.style), '');
   strictEqual(header.children[2].style.clear, '');
   strictEqual(floatStyle(footer.children[0].style), '');
-  strictEqual(floatStyle(footer.children[1].style), '');
-  strictEqual(footer.children[1].style.listStyle, '');
+  strictEqual(floatStyle(pager.style), '');
+  strictEqual(pager.style.listStyle, '');
   strictEqual(footer.children[2].style.clear, '');
-  strictEqual(footer.children[1].children[0].style.display, '');
-  strictEqual(footer.children[1].children[1].style.display, '');
-  strictEqual(footer.children[1].children[0].style.marginRight, '');
-  strictEqual(footer.children[1].children[1].style.marginRight, '');
+  strictEqual(pager.children[0].style.display, '');
+  strictEqual(pager.children[1].style.display, '');
+  strictEqual(pager.children[0].style.marginRight, '');
+  strictEqual(pager.children[1].style.marginRight, '');
   strictEqual(headRow.children[0].style.padding, '');
   strictEqual(headRow.children[1].style.padding, '');
   strictEqual(headRow.children[2].style.padding, '');
@@ -812,8 +756,8 @@ test('Dable with style="clear" has basic elements but no style', function() {
   strictEqual(tbody.children[0].children[2].style.padding, '');
   strictEqual(tbody.children[0].children[3].style.padding, '');
   //Classes
-  strictEqual(footer.children[1].children[0].className, 'table-page');
-  strictEqual(footer.children[1].children[1].className, 'table-page');
+  strictEqual(pager.children[0].className, 'table-page');
+  strictEqual(pager.children[1].className, 'table-page');
   strictEqual(headRow.children[0].children[1].className, 'table-sort');
   strictEqual(headRow.children[1].children[1].className, 'table-sort');
   strictEqual(headRow.children[2].children[1].className, 'table-sort');
@@ -829,7 +773,7 @@ test('Dable with style="clear" has basic elements but no style', function() {
   strictEqual(tbody.children[8].className, 'table-row-even');
   strictEqual(tbody.children[9].className, 'table-row-odd');
   //State
-  strictEqual(footer.children[1].children[0].getAttribute('disabled'),
+  strictEqual(pager.children[0].getAttribute('disabled'),
     'disabled');
 });
 test('Dable with style="bootstrap" has basic elements and slightly ' +
@@ -846,16 +790,17 @@ test('Dable with style="bootstrap" has basic elements and slightly ' +
   //Element pattern
   strictEqual(testDiv.children.length, 3);
   var header = testDiv.children[0];
-  var pager = header.children[0];
-  var pageSelect = pager.children[1];
+  var pageSize = header.children[0];
+  var pageSelect = pageSize.children[1];
   var search = header.children[1];
   var table = testDiv.querySelector('table');
   var headRow = table.children[0].children[0];
   var tbody = table.children[1];
   var footer = testDiv.children[2];
+  var pager = footer.children[1];
   strictEqual(header.children.length, 3);
-  strictEqual(pager.children.length, 2);
-  strictEqual(pager.children[0].children.length, 0);
+  strictEqual(pageSize.children.length, 2);
+  strictEqual(pageSize.children[0].children.length, 0);
   strictEqual(pageSelect.children.length, 4);
   strictEqual(pageSelect.children[0].children.length, 0);
   strictEqual(pageSelect.children[1].children.length, 0);
@@ -868,10 +813,11 @@ test('Dable with style="bootstrap" has basic elements and slightly ' +
   strictEqual(footer.children.length, 3);
   strictEqual(footer.children[0].children.length, 1);
   strictEqual(footer.children[0].children[0].children.length, 0);
-  strictEqual(footer.children[1].children.length, 2);
-  strictEqual(footer.children[1].children[0].children.length, 1);
-  strictEqual(footer.children[1].children[0].children[0].children.length, 0);
-  strictEqual(footer.children[1].children[1].children[0].children.length, 0);
+  strictEqual(pager.children.length, 2);
+  strictEqual(pager.children[0].children.length, 1);
+  strictEqual(pager.children[0].children[0].children.length, 0);
+  strictEqual(pager.children[1].children.length, 1);
+  strictEqual(pager.children[1].children[0].children.length, 0);
   strictEqual(footer.children[2].children.length, 0);
   strictEqual(table.children.length, 2);
   strictEqual(table.children[0].children.length, 1);
@@ -903,11 +849,11 @@ test('Dable with style="bootstrap" has basic elements and slightly ' +
   strictEqual(footer.id, testDiv.id + '_footer');
   strictEqual(search.children[1].id, testDiv.id + '_search');
   strictEqual(footer.children[0].children[0].id, testDiv.id + '_showing');
-  strictEqual(footer.children[1].children[0].id, testDiv.id + '_page_prev');
-  strictEqual(footer.children[1].children[1].id, testDiv.id + '_page_next');
+  strictEqual(pager.children[0].id, testDiv.id + '_page_prev');
+  strictEqual(pager.children[1].id, testDiv.id + '_page_next');
   strictEqual(tbody.id, testDiv.id + '_body');
   //Text
-  strictEqual(pager.children[0].innerHTML, 'Show ');
+  strictEqual(pageSize.children[0].innerHTML, 'Show ');
   strictEqual(search.children[0].innerHTML, 'Search ');
   strictEqual(footer.children[0].children[0].innerHTML,
     'Showing 1 to 10 of 20 entries');
@@ -916,8 +862,8 @@ test('Dable with style="bootstrap" has basic elements and slightly ' +
   strictEqual(pageSelect.children[2].innerHTML, '50');
   strictEqual(pageSelect.children[3].innerHTML, '100');
   // different from default
-  strictEqual(footer.children[1].children[0].children[0].innerHTML, '');
-  strictEqual(footer.children[1].children[1].children[0].innerHTML, '');
+  strictEqual(pager.children[0].children[0].innerHTML, '');
+  strictEqual(pager.children[1].children[0].innerHTML, '');
   // /different
   strictEqual(headRow.children[0].children[0].innerHTML, 'Column 0 ');
   strictEqual(headRow.children[1].children[0].innerHTML, 'Column 1 ');
@@ -936,22 +882,22 @@ test('Dable with style="bootstrap" has basic elements and slightly ' +
   strictEqual(table.style.width, '100%');
   strictEqual(header.style.padding, '5px');
   strictEqual(footer.style.padding, '5px');
-  var myTest = pager.style;
+  var myTest = pageSize.style;
   strictEqual(floatStyle(myTest), 'left');
   myTest = search.style;
   strictEqual(floatStyle(myTest), 'right');
   strictEqual(header.children[2].style.clear, 'both');
   myTest = footer.children[0].style;
   strictEqual(floatStyle(myTest), 'left');
-  myTest = footer.children[1].style;
+  myTest = pager.style;
   strictEqual(floatStyle(myTest), 'right');
-  strictEqual(footer.children[1].style.listStyleType, 'none');
+  strictEqual(pager.style.listStyleType, 'none');
   strictEqual(footer.children[2].style.clear, 'both');
   // different from default
-  strictEqual(footer.children[1].children[0].style.display, '');
-  strictEqual(footer.children[1].children[1].style.display, '');
-  strictEqual(footer.children[1].children[0].style.marginRight, '');
-  strictEqual(footer.children[1].children[1].style.marginRight, '');
+  strictEqual(pager.children[0].style.display, '');
+  strictEqual(pager.children[1].style.display, '');
+  strictEqual(pager.children[0].style.marginRight, '');
+  strictEqual(pager.children[1].style.marginRight, '');
   // /different
   strictEqual(headRow.children[0].style.padding, '5px');
   strictEqual(headRow.children[1].style.padding, '5px');
@@ -995,9 +941,9 @@ test('Dable with style="bootstrap" has basic elements and slightly ' +
   strictEqual(tbody.children[0].children[3].style.padding, '5px');
   //Classes
   // different from default
-  strictEqual(footer.children[1].children[0].className,
+  strictEqual(pager.children[0].className,
     'btn btn-default table-page');
-  strictEqual(footer.children[1].children[1].className,
+  strictEqual(pager.children[1].className,
     'btn btn-default table-page');
   strictEqual(headRow.children[0].children[1].className, 'table-sort');
   strictEqual(headRow.children[1].children[1].className, 'table-sort');
@@ -1015,7 +961,7 @@ test('Dable with style="bootstrap" has basic elements and slightly ' +
   strictEqual(tbody.children[8].className, 'table-row-even');
   strictEqual(tbody.children[9].className, 'table-row-odd');
   //State
-  strictEqual(footer.children[1].children[0].getAttribute('disabled'),
+  strictEqual(pager.children[0].getAttribute('disabled'),
     'disabled');
 });
 test('Dable with style="JqueryUI" has basic elements and slightly ' +
@@ -1032,16 +978,17 @@ test('Dable with style="JqueryUI" has basic elements and slightly ' +
   //Element pattern
   strictEqual(testDiv.children.length, 3);
   var header = testDiv.children[0];
-  var pager = header.children[0];
-  var pageSelect = pager.children[1];
+  var pageSize = header.children[0];
+  var pageSelect = pageSize.children[1];
   var search = header.children[1];
   var table = testDiv.querySelector('table');
   var headRow = table.children[0].children[0];
   var tbody = table.children[1];
   var footer = testDiv.children[2];
+  var pager = footer.children[1];
   strictEqual(header.children.length, 3);
-  strictEqual(pager.children.length, 2);
-  strictEqual(pager.children[0].children.length, 0);
+  strictEqual(pageSize.children.length, 2);
+  strictEqual(pageSize.children[0].children.length, 0);
   strictEqual(pageSelect.children.length, 4);
   strictEqual(pageSelect.children[0].children.length, 0);
   strictEqual(pageSelect.children[1].children.length, 0);
@@ -1054,10 +1001,11 @@ test('Dable with style="JqueryUI" has basic elements and slightly ' +
   strictEqual(footer.children.length, 3);
   strictEqual(footer.children[0].children.length, 1);
   strictEqual(footer.children[0].children[0].children.length, 0);
-  strictEqual(footer.children[1].children.length, 2);
-  strictEqual(footer.children[1].children[0].children.length, 1);
-  strictEqual(footer.children[1].children[0].children[0].children.length, 0);
-  strictEqual(footer.children[1].children[1].children[0].children.length, 0);
+  strictEqual(pager.children.length, 2);
+  strictEqual(pager.children[0].children.length, 1);
+  strictEqual(pager.children[0].children[0].children.length, 0);
+  strictEqual(pager.children[1].children.length, 1);
+  strictEqual(pager.children[1].children[0].children.length, 0);
   strictEqual(footer.children[2].children.length, 0);
   strictEqual(table.children.length, 2);
   strictEqual(table.children[0].children.length, 1);
@@ -1089,11 +1037,11 @@ test('Dable with style="JqueryUI" has basic elements and slightly ' +
   strictEqual(footer.id, testDiv.id + '_footer');
   strictEqual(search.children[1].id, testDiv.id + '_search');
   strictEqual(footer.children[0].children[0].id, testDiv.id + '_showing');
-  strictEqual(footer.children[1].children[0].id, testDiv.id + '_page_prev');
-  strictEqual(footer.children[1].children[1].id, testDiv.id + '_page_next');
+  strictEqual(pager.children[0].id, testDiv.id + '_page_prev');
+  strictEqual(pager.children[1].id, testDiv.id + '_page_next');
   strictEqual(tbody.id, testDiv.id + '_body');
   //Text
-  strictEqual(pager.children[0].innerHTML, 'Show ');
+  strictEqual(pageSize.children[0].innerHTML, 'Show ');
   strictEqual(search.children[0].innerHTML, 'Search ');
   strictEqual(footer.children[0].children[0].innerHTML,
     'Showing 1 to 10 of 20 entries');
@@ -1102,8 +1050,8 @@ test('Dable with style="JqueryUI" has basic elements and slightly ' +
   strictEqual(pageSelect.children[2].innerHTML, '50');
   strictEqual(pageSelect.children[3].innerHTML, '100');
   // different from default
-  strictEqual(footer.children[1].children[0].children[0].innerHTML, '');
-  strictEqual(footer.children[1].children[1].children[0].innerHTML, '');
+  strictEqual(pager.children[0].children[0].innerHTML, '');
+  strictEqual(pager.children[1].children[0].innerHTML, '');
   // /different
   strictEqual(headRow.children[0].children[0].innerHTML, 'Column 0 ');
   strictEqual(headRow.children[1].children[0].innerHTML, 'Column 1 ');
@@ -1122,22 +1070,22 @@ test('Dable with style="JqueryUI" has basic elements and slightly ' +
   strictEqual(table.style.width, '100%');
   strictEqual(header.style.padding, '5px');
   strictEqual(footer.style.padding, '5px');
-  var myTest = pager.style;
+  var myTest = pageSize.style;
   strictEqual(floatStyle(myTest), 'left');
   myTest = search.style;
   strictEqual(floatStyle(myTest), 'right');
   strictEqual(header.children[2].style.clear, 'both');
   myTest = footer.children[0].style;
   strictEqual(floatStyle(myTest), 'left');
-  myTest = footer.children[1].style;
+  myTest = pager.style;
   strictEqual(floatStyle(myTest), 'right');
-  strictEqual(footer.children[1].style.listStyleType, 'none');
+  strictEqual(pager.style.listStyleType, 'none');
   strictEqual(footer.children[2].style.clear, 'both');
   // different from default
-  strictEqual(footer.children[1].children[0].style.display, '');
-  strictEqual(footer.children[1].children[1].style.display, '');
-  strictEqual(footer.children[1].children[0].style.marginRight, '');
-  strictEqual(footer.children[1].children[1].style.marginRight, '');
+  strictEqual(pager.children[0].style.display, '');
+  strictEqual(pager.children[1].style.display, '');
+  strictEqual(pager.children[0].style.marginRight, '');
+  strictEqual(pager.children[1].style.marginRight, '');
   // /different
   strictEqual(headRow.children[0].style.padding, '5px');
   strictEqual(headRow.children[1].style.padding, '5px');
@@ -1181,10 +1129,10 @@ test('Dable with style="JqueryUI" has basic elements and slightly ' +
   strictEqual(tbody.children[0].children[3].style.padding, '5px');
   //Classes
   // different from default
-  strictEqual(footer.children[1].children[0].className,
+  strictEqual(pager.children[0].className,
     'fg-button ui-button ui-state-default ' +
     'ui-corner-left table-page ui-state-disabled');
-  strictEqual(footer.children[1].children[1].className,
+  strictEqual(pager.children[1].className,
     'fg-button ui-button ui-state-default ui-corner-left table-page');
   strictEqual(headRow.children[0].children[1].className, 'table-sort');
   strictEqual(headRow.children[1].children[1].className, 'table-sort');
@@ -1202,9 +1150,616 @@ test('Dable with style="JqueryUI" has basic elements and slightly ' +
   strictEqual(tbody.children[8].className, 'table-row-even');
   strictEqual(tbody.children[9].className, 'table-row-odd');
   //State
-  strictEqual(footer.children[1].children[0].getAttribute('disabled'),
+  strictEqual(pager.children[0].getAttribute('disabled'),
     'disabled');
 });
+test('Dable multi page Pager with style="none" looks right', function() {
+  //Given: a Dable with a multi page Pager and style='none'
+  makePagerDable(testDiv);
+
+  //Then: it looks right
+  var pager = testDiv.children[2].children[1];
+  //Element pattern
+  strictEqual(pager.children.length, 9, 'Pager has 9 elements');
+  strictEqual(pager.children[0].children.length, 1,
+    'First element has one child');
+  strictEqual(pager.children[1].children.length, 1,
+    'Second element has one child');
+  strictEqual(pager.children[2].children.length, 1,
+    'Third element has one child');
+  strictEqual(pager.children[3].children.length, 1,
+    'Fourth element has one child');
+  strictEqual(pager.children[4].children.length, 1,
+    'Fifth element has one child');
+  strictEqual(pager.children[5].children.length, 1,
+    'Sixth element has one child');
+  strictEqual(pager.children[6].children.length, 1,
+    'Seventh element has one child');
+  strictEqual(pager.children[7].children.length, 1,
+    'Eighth element has one child');
+  strictEqual(pager.children[8].children.length, 1,
+    'Ninth element has one child');
+  strictEqual(pager.children[0].children[0].children.length, 0,
+    'First element child has no decendants');
+  strictEqual(pager.children[1].children[0].children.length, 0,
+    'Second element child has no decendants');
+  strictEqual(pager.children[2].children[0].children.length, 0,
+    'Third element child has no decendants');
+  strictEqual(pager.children[3].children[0].children.length, 0,
+    'Fourth element child has no decendants');
+  strictEqual(pager.children[4].children[0].children.length, 0,
+    'Fifth element child has no decendants');
+  strictEqual(pager.children[5].children[0].children.length, 0,
+    'Sixth element child has no decendants');
+  strictEqual(pager.children[6].children[0].children.length, 0,
+    'Seventh element child has no decendants');
+  strictEqual(pager.children[7].children[0].children.length, 0,
+    'Eighth element child has no decendants');
+  strictEqual(pager.children[8].children[0].children.length, 0,
+    'Ninth element child has no decendants');
+  //IDs
+  strictEqual(pager.children[0].id, testDiv.id + '_page_first');
+  strictEqual(pager.children[1].id, testDiv.id + '_page_prev');
+  strictEqual(pager.children[2].id, '');
+  strictEqual(pager.children[3].id, '');
+  strictEqual(pager.children[4].id, '');
+  strictEqual(pager.children[5].id, '');
+  strictEqual(pager.children[6].id, '');
+  strictEqual(pager.children[7].id, testDiv.id + '_page_next');
+  strictEqual(pager.children[8].id, testDiv.id + '_page_last');
+  //Text
+  strictEqual(pager.children[0].children[0].innerHTML, 'First');
+  strictEqual(pager.children[1].children[0].innerHTML, 'Prev');
+  strictEqual(pager.children[2].children[0].innerHTML, '1');
+  strictEqual(pager.children[3].children[0].innerHTML, '2');
+  strictEqual(pager.children[4].children[0].innerHTML, '3');
+  strictEqual(pager.children[5].children[0].innerHTML, '4');
+  strictEqual(pager.children[6].children[0].innerHTML, '5');
+  strictEqual(pager.children[7].children[0].innerHTML, 'Next');
+  strictEqual(pager.children[8].children[0].innerHTML, 'Last');
+  //Attributes
+  strictEqual(pager.children[0].getAttribute('disabled'), 'disabled',
+    'First is disabled');
+  strictEqual(pager.children[1].getAttribute('disabled'), 'disabled',
+    'Prev is disabled');
+  strictEqual(pager.children[2].getAttribute('disabled'), 'disabled',
+    '1 is disabled');
+  notOk(pager.children[3].getAttribute('disabled'), '2 is not disabled');
+  notOk(pager.children[4].getAttribute('disabled'), '3 is not disabled');
+  notOk(pager.children[5].getAttribute('disabled'), '4 is not disabled');
+  notOk(pager.children[6].getAttribute('disabled'), '5 is not disabled');
+  notOk(pager.children[7].getAttribute('disabled'), 'Next is not disabled');
+  notOk(pager.children[8].getAttribute('disabled'), 'Last is not disabled');
+  //Styles
+  var myTest = pager.style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(pager.style.listStyleType, 'none');
+  strictEqual(pager.children[0].style.display, 'inline');
+  strictEqual(pager.children[0].style.marginRight, '5px');
+  strictEqual(pager.children[1].style.display, 'inline');
+  strictEqual(pager.children[1].style.marginRight, '5px');
+  strictEqual(pager.children[2].style.display, 'inline');
+  strictEqual(pager.children[2].style.marginRight, '5px');
+  strictEqual(pager.children[3].style.display, 'inline');
+  strictEqual(pager.children[3].style.marginRight, '5px');
+  strictEqual(pager.children[4].style.display, 'inline');
+  strictEqual(pager.children[4].style.marginRight, '5px');
+  strictEqual(pager.children[5].style.display, 'inline');
+  strictEqual(pager.children[5].style.marginRight, '5px');
+  strictEqual(pager.children[6].style.display, 'inline');
+  strictEqual(pager.children[6].style.marginRight, '5px');
+  strictEqual(pager.children[7].style.display, 'inline');
+  strictEqual(pager.children[7].style.marginRight, '5px');
+  strictEqual(pager.children[8].style.display, 'inline');
+  strictEqual(pager.children[8].style.marginRight, '5px');
+  //Classes
+  strictEqual(pager.children[0].className, 'table-page');
+  strictEqual(pager.children[1].className, 'table-page');
+  strictEqual(pager.children[2].className, 'table-page');
+  strictEqual(pager.children[3].className, 'table-page');
+  strictEqual(pager.children[4].className, 'table-page');
+  strictEqual(pager.children[5].className, 'table-page');
+  strictEqual(pager.children[6].className, 'table-page');
+  strictEqual(pager.children[7].className, 'table-page');
+  strictEqual(pager.children[8].className, 'table-page');
+});
+test('Dable multi page Pager with style="clear" looks right', function() {
+  //Given: a Dable with a multi page Pager and style='clear'
+  var dable = makePagerDable(testDiv);
+  dable.style = 'clear';
+  dable.UpdateStyle();
+
+  //Then: it looks right
+  var pager = testDiv.children[2].children[1];
+  //Element pattern
+  strictEqual(pager.children.length, 9, 'Pager has 9 elements');
+  strictEqual(pager.children[0].children.length, 1,
+    'First element has one child');
+  strictEqual(pager.children[1].children.length, 1,
+    'Second element has one child');
+  strictEqual(pager.children[2].children.length, 1,
+    'Third element has one child');
+  strictEqual(pager.children[3].children.length, 1,
+    'Fourth element has one child');
+  strictEqual(pager.children[4].children.length, 1,
+    'Fifth element has one child');
+  strictEqual(pager.children[5].children.length, 1,
+    'Sixth element has one child');
+  strictEqual(pager.children[6].children.length, 1,
+    'Seventh element has one child');
+  strictEqual(pager.children[7].children.length, 1,
+    'Eighth element has one child');
+  strictEqual(pager.children[8].children.length, 1,
+    'Ninth element has one child');
+  strictEqual(pager.children[0].children[0].children.length, 0,
+    'First element child has no decendants');
+  strictEqual(pager.children[1].children[0].children.length, 0,
+    'Second element child has no decendants');
+  strictEqual(pager.children[2].children[0].children.length, 0,
+    'Third element child has no decendants');
+  strictEqual(pager.children[3].children[0].children.length, 0,
+    'Fourth element child has no decendants');
+  strictEqual(pager.children[4].children[0].children.length, 0,
+    'Fifth element child has no decendants');
+  strictEqual(pager.children[5].children[0].children.length, 0,
+    'Sixth element child has no decendants');
+  strictEqual(pager.children[6].children[0].children.length, 0,
+    'Seventh element child has no decendants');
+  strictEqual(pager.children[7].children[0].children.length, 0,
+    'Eighth element child has no decendants');
+  strictEqual(pager.children[8].children[0].children.length, 0,
+    'Ninth element child has no decendants');
+  //IDs
+  strictEqual(pager.children[0].id, testDiv.id + '_page_first');
+  strictEqual(pager.children[1].id, testDiv.id + '_page_prev');
+  strictEqual(pager.children[2].id, '');
+  strictEqual(pager.children[3].id, '');
+  strictEqual(pager.children[4].id, '');
+  strictEqual(pager.children[5].id, '');
+  strictEqual(pager.children[6].id, '');
+  strictEqual(pager.children[7].id, testDiv.id + '_page_next');
+  strictEqual(pager.children[8].id, testDiv.id + '_page_last');
+  //Text
+  strictEqual(pager.children[0].children[0].innerHTML, 'First');
+  strictEqual(pager.children[1].children[0].innerHTML, 'Prev');
+  strictEqual(pager.children[2].children[0].innerHTML, '1');
+  strictEqual(pager.children[3].children[0].innerHTML, '2');
+  strictEqual(pager.children[4].children[0].innerHTML, '3');
+  strictEqual(pager.children[5].children[0].innerHTML, '4');
+  strictEqual(pager.children[6].children[0].innerHTML, '5');
+  strictEqual(pager.children[7].children[0].innerHTML, 'Next');
+  strictEqual(pager.children[8].children[0].innerHTML, 'Last');
+  //Attributes
+  strictEqual(pager.children[0].getAttribute('disabled'), 'disabled',
+    'First is disabled');
+  strictEqual(pager.children[1].getAttribute('disabled'), 'disabled',
+    'Prev is disabled');
+  strictEqual(pager.children[2].getAttribute('disabled'), 'disabled',
+    '1 is disabled');
+  notOk(pager.children[3].getAttribute('disabled'), '2 is not disabled');
+  notOk(pager.children[4].getAttribute('disabled'), '3 is not disabled');
+  notOk(pager.children[5].getAttribute('disabled'), '4 is not disabled');
+  notOk(pager.children[6].getAttribute('disabled'), '5 is not disabled');
+  notOk(pager.children[7].getAttribute('disabled'), 'Next is not disabled');
+  notOk(pager.children[8].getAttribute('disabled'), 'Last is not disabled');
+  //Styles
+  var myTest = pager.style;
+  strictEqual(floatStyle(myTest), '');
+  strictEqual(pager.style.listStyleType, '');
+  strictEqual(pager.children[0].style.display, '');
+  strictEqual(pager.children[0].style.marginRight, '');
+  strictEqual(pager.children[1].style.display, '');
+  strictEqual(pager.children[1].style.marginRight, '');
+  strictEqual(pager.children[2].style.display, '');
+  strictEqual(pager.children[2].style.marginRight, '');
+  strictEqual(pager.children[3].style.display, '');
+  strictEqual(pager.children[3].style.marginRight, '');
+  strictEqual(pager.children[4].style.display, '');
+  strictEqual(pager.children[4].style.marginRight, '');
+  strictEqual(pager.children[5].style.display, '');
+  strictEqual(pager.children[5].style.marginRight, '');
+  strictEqual(pager.children[6].style.display, '');
+  strictEqual(pager.children[6].style.marginRight, '');
+  strictEqual(pager.children[7].style.display, '');
+  strictEqual(pager.children[7].style.marginRight, '');
+  strictEqual(pager.children[8].style.display, '');
+  strictEqual(pager.children[8].style.marginRight, '');
+  //Classes
+  strictEqual(pager.children[0].className, 'table-page');
+  strictEqual(pager.children[1].className, 'table-page');
+  strictEqual(pager.children[2].className, 'table-page');
+  strictEqual(pager.children[3].className, 'table-page');
+  strictEqual(pager.children[4].className, 'table-page');
+  strictEqual(pager.children[5].className, 'table-page');
+  strictEqual(pager.children[6].className, 'table-page');
+  strictEqual(pager.children[7].className, 'table-page');
+  strictEqual(pager.children[8].className, 'table-page');
+});
+test('Dable multi page Pager with style="bootstrap" looks right', function() {
+  //Given: a Dable with a multi page Pager and style='bootstrap'
+  var dable = makePagerDable(testDiv);
+  dable.style = 'bootstrap';
+  dable.UpdateStyle();
+
+  //Then: it looks right
+  var pager = testDiv.children[2].children[1];
+  //Element pattern
+  strictEqual(pager.children.length, 9, 'Pager has 9 elements');
+  strictEqual(pager.children[0].children.length, 1,
+    'First element has one child');
+  strictEqual(pager.children[1].children.length, 1,
+    'Second element has one child');
+  strictEqual(pager.children[2].children.length, 1,
+    'Third element has one child');
+  strictEqual(pager.children[3].children.length, 1,
+    'Fourth element has one child');
+  strictEqual(pager.children[4].children.length, 1,
+    'Fifth element has one child');
+  strictEqual(pager.children[5].children.length, 1,
+    'Sixth element has one child');
+  strictEqual(pager.children[6].children.length, 1,
+    'Seventh element has one child');
+  strictEqual(pager.children[7].children.length, 1,
+    'Eighth element has one child');
+  strictEqual(pager.children[8].children.length, 1,
+    'Ninth element has one child');
+  strictEqual(pager.children[0].children[0].children.length, 0,
+    'First element child has no decendants');
+  strictEqual(pager.children[1].children[0].children.length, 0,
+    'Second element child has no decendants');
+  strictEqual(pager.children[2].children[0].children.length, 0,
+    'Third element child has no decendants');
+  strictEqual(pager.children[3].children[0].children.length, 0,
+    'Fourth element child has no decendants');
+  strictEqual(pager.children[4].children[0].children.length, 0,
+    'Fifth element child has no decendants');
+  strictEqual(pager.children[5].children[0].children.length, 0,
+    'Sixth element child has no decendants');
+  strictEqual(pager.children[6].children[0].children.length, 0,
+    'Seventh element child has no decendants');
+  strictEqual(pager.children[7].children[0].children.length, 0,
+    'Eighth element child has no decendants');
+  strictEqual(pager.children[8].children[0].children.length, 0,
+    'Ninth element child has no decendants');
+  //IDs
+  strictEqual(pager.children[0].id, testDiv.id + '_page_first');
+  strictEqual(pager.children[1].id, testDiv.id + '_page_prev');
+  strictEqual(pager.children[2].id, '');
+  strictEqual(pager.children[3].id, '');
+  strictEqual(pager.children[4].id, '');
+  strictEqual(pager.children[5].id, '');
+  strictEqual(pager.children[6].id, '');
+  strictEqual(pager.children[7].id, testDiv.id + '_page_next');
+  strictEqual(pager.children[8].id, testDiv.id + '_page_last');
+  //Text
+  strictEqual(pager.children[0].children[0].innerHTML, '');
+  strictEqual(pager.children[1].children[0].innerHTML, '');
+  strictEqual(pager.children[2].children[0].innerHTML, '1');
+  strictEqual(pager.children[3].children[0].innerHTML, '2');
+  strictEqual(pager.children[4].children[0].innerHTML, '3');
+  strictEqual(pager.children[5].children[0].innerHTML, '4');
+  strictEqual(pager.children[6].children[0].innerHTML, '5');
+  strictEqual(pager.children[7].children[0].innerHTML, '');
+  strictEqual(pager.children[8].children[0].innerHTML, '');
+  //Attributes
+  strictEqual(pager.children[0].getAttribute('disabled'), 'disabled',
+    'First is disabled');
+  strictEqual(pager.children[1].getAttribute('disabled'), 'disabled',
+    'Prev is disabled');
+  strictEqual(pager.children[2].getAttribute('disabled'), 'disabled',
+    '1 is disabled');
+  notOk(pager.children[3].getAttribute('disabled'), '2 is not disabled');
+  notOk(pager.children[4].getAttribute('disabled'), '3 is not disabled');
+  notOk(pager.children[5].getAttribute('disabled'), '4 is not disabled');
+  notOk(pager.children[6].getAttribute('disabled'), '5 is not disabled');
+  notOk(pager.children[7].getAttribute('disabled'), 'Next is not disabled');
+  notOk(pager.children[8].getAttribute('disabled'), 'Last is not disabled');
+  //Styles
+  var myTest = pager.style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(pager.style.listStyleType, 'none');
+  strictEqual(pager.children[0].style.display, '');
+  strictEqual(pager.children[0].style.marginRight, '');
+  strictEqual(pager.children[1].style.display, '');
+  strictEqual(pager.children[1].style.marginRight, '');
+  strictEqual(pager.children[2].style.display, '');
+  strictEqual(pager.children[2].style.marginRight, '');
+  strictEqual(pager.children[3].style.display, '');
+  strictEqual(pager.children[3].style.marginRight, '');
+  strictEqual(pager.children[4].style.display, '');
+  strictEqual(pager.children[4].style.marginRight, '');
+  strictEqual(pager.children[5].style.display, '');
+  strictEqual(pager.children[5].style.marginRight, '');
+  strictEqual(pager.children[6].style.display, '');
+  strictEqual(pager.children[6].style.marginRight, '');
+  strictEqual(pager.children[7].style.display, '');
+  strictEqual(pager.children[7].style.marginRight, '');
+  strictEqual(pager.children[8].style.display, '');
+  strictEqual(pager.children[8].style.marginRight, '');
+  //Classes
+  strictEqual(pager.children[0].className, 'btn btn-default table-page');
+  strictEqual(pager.children[0].children[0].className,
+    'glyphicon glyphicon-fast-backward');
+  strictEqual(pager.children[1].className, 'btn btn-default table-page');
+  strictEqual(pager.children[1].children[0].className,
+    'glyphicon glyphicon-arrow-left');
+  strictEqual(pager.children[2].className, 'btn btn-default table-page');
+  strictEqual(pager.children[3].className, 'btn btn-default table-page');
+  strictEqual(pager.children[4].className, 'btn btn-default table-page');
+  strictEqual(pager.children[5].className, 'btn btn-default table-page');
+  strictEqual(pager.children[6].className, 'btn btn-default table-page');
+  strictEqual(pager.children[7].className, 'btn btn-default table-page');
+  strictEqual(pager.children[7].children[0].className,
+    'glyphicon glyphicon-arrow-right');
+  strictEqual(pager.children[8].className, 'btn btn-default table-page');
+  strictEqual(pager.children[8].children[0].className,
+    'glyphicon glyphicon-fast-forward');
+});
+test('Dable multi page Pager with style="JqueryUI" looks right', function() {
+  //Given: a Dable with a multi page Pager and style='JqueryUI'
+  var dable = makePagerDable(testDiv);
+  dable.style = 'JqueryUI';
+  dable.UpdateStyle();
+
+  //Then: it looks right
+  var pager = testDiv.children[2].children[1];
+  //Element pattern
+  strictEqual(pager.children.length, 9, 'Pager has 9 elements');
+  strictEqual(pager.children[0].children.length, 1,
+    'First element has one child');
+  strictEqual(pager.children[1].children.length, 1,
+    'Second element has one child');
+  strictEqual(pager.children[2].children.length, 1,
+    'Third element has one child');
+  strictEqual(pager.children[3].children.length, 1,
+    'Fourth element has one child');
+  strictEqual(pager.children[4].children.length, 1,
+    'Fifth element has one child');
+  strictEqual(pager.children[5].children.length, 1,
+    'Sixth element has one child');
+  strictEqual(pager.children[6].children.length, 1,
+    'Seventh element has one child');
+  strictEqual(pager.children[7].children.length, 1,
+    'Eighth element has one child');
+  strictEqual(pager.children[8].children.length, 1,
+    'Ninth element has one child');
+  strictEqual(pager.children[0].children[0].children.length, 0,
+    'First element child has no decendants');
+  strictEqual(pager.children[1].children[0].children.length, 0,
+    'Second element child has no decendants');
+  strictEqual(pager.children[2].children[0].children.length, 0,
+    'Third element child has no decendants');
+  strictEqual(pager.children[3].children[0].children.length, 0,
+    'Fourth element child has no decendants');
+  strictEqual(pager.children[4].children[0].children.length, 0,
+    'Fifth element child has no decendants');
+  strictEqual(pager.children[5].children[0].children.length, 0,
+    'Sixth element child has no decendants');
+  strictEqual(pager.children[6].children[0].children.length, 0,
+    'Seventh element child has no decendants');
+  strictEqual(pager.children[7].children[0].children.length, 0,
+    'Eighth element child has no decendants');
+  strictEqual(pager.children[8].children[0].children.length, 0,
+    'Ninth element child has no decendants');
+  //IDs
+  strictEqual(pager.children[0].id, testDiv.id + '_page_first');
+  strictEqual(pager.children[1].id, testDiv.id + '_page_prev');
+  strictEqual(pager.children[2].id, '');
+  strictEqual(pager.children[3].id, '');
+  strictEqual(pager.children[4].id, '');
+  strictEqual(pager.children[5].id, '');
+  strictEqual(pager.children[6].id, '');
+  strictEqual(pager.children[7].id, testDiv.id + '_page_next');
+  strictEqual(pager.children[8].id, testDiv.id + '_page_last');
+  //Text
+  strictEqual(pager.children[0].children[0].innerHTML, '');
+  strictEqual(pager.children[1].children[0].innerHTML, '');
+  strictEqual(pager.children[2].children[0].innerHTML, '1');
+  strictEqual(pager.children[3].children[0].innerHTML, '2');
+  strictEqual(pager.children[4].children[0].innerHTML, '3');
+  strictEqual(pager.children[5].children[0].innerHTML, '4');
+  strictEqual(pager.children[6].children[0].innerHTML, '5');
+  strictEqual(pager.children[7].children[0].innerHTML, '');
+  strictEqual(pager.children[8].children[0].innerHTML, '');
+  //Attributes
+  strictEqual(pager.children[0].getAttribute('disabled'), 'disabled',
+    'First is disabled');
+  strictEqual(pager.children[1].getAttribute('disabled'), 'disabled',
+    'Prev is disabled');
+  strictEqual(pager.children[2].getAttribute('disabled'), 'disabled',
+    '1 is disabled');
+  notOk(pager.children[3].getAttribute('disabled'), '2 is not disabled');
+  notOk(pager.children[4].getAttribute('disabled'), '3 is not disabled');
+  notOk(pager.children[5].getAttribute('disabled'), '4 is not disabled');
+  notOk(pager.children[6].getAttribute('disabled'), '5 is not disabled');
+  notOk(pager.children[7].getAttribute('disabled'), 'Next is not disabled');
+  notOk(pager.children[8].getAttribute('disabled'), 'Last is not disabled');
+  //Styles
+  var myTest = pager.style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(pager.style.listStyleType, 'none');
+  strictEqual(pager.children[0].style.display, '');
+  strictEqual(pager.children[0].style.marginRight, '');
+  strictEqual(pager.children[1].style.display, '');
+  strictEqual(pager.children[1].style.marginRight, '');
+  strictEqual(pager.children[2].style.display, '');
+  strictEqual(pager.children[2].style.marginRight, '');
+  strictEqual(pager.children[3].style.display, '');
+  strictEqual(pager.children[3].style.marginRight, '');
+  strictEqual(pager.children[4].style.display, '');
+  strictEqual(pager.children[4].style.marginRight, '');
+  strictEqual(pager.children[5].style.display, '');
+  strictEqual(pager.children[5].style.marginRight, '');
+  strictEqual(pager.children[6].style.display, '');
+  strictEqual(pager.children[6].style.marginRight, '');
+  strictEqual(pager.children[7].style.display, '');
+  strictEqual(pager.children[7].style.marginRight, '');
+  strictEqual(pager.children[8].style.display, '');
+  strictEqual(pager.children[8].style.marginRight, '');
+  //Classes
+  strictEqual(pager.children[0].className,
+    'fg-button ui-button ui-state-default ui-corner-left table-page');
+  strictEqual(pager.children[0].children[0].className,
+    'ui-icon ui-icon-arrowthickstop-1-w');
+  strictEqual(pager.children[1].className,
+    'fg-button ui-button ui-state-default ui-corner-left ' +
+    'table-page ui-state-disabled');
+  strictEqual(pager.children[1].children[0].className,
+    'ui-icon ui-icon-circle-arrow-w');
+  strictEqual(pager.children[2].className,
+  'fg-button ui-button ui-state-default ui-corner-left table-page');
+  strictEqual(pager.children[3].className,
+  'fg-button ui-button ui-state-default ui-corner-left table-page');
+  strictEqual(pager.children[4].className,
+  'fg-button ui-button ui-state-default ui-corner-left table-page');
+  strictEqual(pager.children[5].className,
+  'fg-button ui-button ui-state-default ui-corner-left table-page');
+  strictEqual(pager.children[6].className,
+  'fg-button ui-button ui-state-default ui-corner-left table-page');
+  strictEqual(pager.children[7].className,
+  'fg-button ui-button ui-state-default ui-corner-left table-page');
+  strictEqual(pager.children[7].children[0].className,
+    'ui-icon ui-icon-circle-arrow-e');
+  strictEqual(pager.children[8].className,
+  'fg-button ui-button ui-state-default ui-corner-left table-page');
+  strictEqual(pager.children[8].children[0].className,
+    'ui-icon ui-icon-arrowthickstop-1-e');
+});
+test('Dable multi page Pager with style="JqueryUI" Last page looks right',
+  function() {
+    //Given: a Dable with a multi page Pager and style='JqueryUI'
+    var dable = makePagerDable(testDiv);
+    // dable.style = 'JqueryUI';
+    dable.UpdateStyle(testDiv, 'JqueryUI');
+
+    //When: we click on Last
+    testDiv.children[2].children[1].children[8].children[0].click();
+
+    //Then: it looks right
+    var pager = testDiv.children[2].children[1];
+    //Element pattern
+    strictEqual(pager.children.length, 9, 'Pager has 9 elements');
+    strictEqual(pager.children[0].children.length, 1,
+      'First element has one child');
+    strictEqual(pager.children[1].children.length, 1,
+      'Second element has one child');
+    strictEqual(pager.children[2].children.length, 1,
+      'Third element has one child');
+    strictEqual(pager.children[3].children.length, 1,
+      'Fourth element has one child');
+    strictEqual(pager.children[4].children.length, 1,
+      'Fifth element has one child');
+    strictEqual(pager.children[5].children.length, 1,
+      'Sixth element has one child');
+    strictEqual(pager.children[6].children.length, 1,
+      'Seventh element has one child');
+    strictEqual(pager.children[7].children.length, 1,
+      'Eighth element has one child');
+    strictEqual(pager.children[8].children.length, 1,
+      'Ninth element has one child');
+    strictEqual(pager.children[0].children[0].children.length, 0,
+      'First element child has no decendants');
+    strictEqual(pager.children[1].children[0].children.length, 0,
+      'Second element child has no decendants');
+    strictEqual(pager.children[2].children[0].children.length, 0,
+      'Third element child has no decendants');
+    strictEqual(pager.children[3].children[0].children.length, 0,
+      'Fourth element child has no decendants');
+    strictEqual(pager.children[4].children[0].children.length, 0,
+      'Fifth element child has no decendants');
+    strictEqual(pager.children[5].children[0].children.length, 0,
+      'Sixth element child has no decendants');
+    strictEqual(pager.children[6].children[0].children.length, 0,
+      'Seventh element child has no decendants');
+    strictEqual(pager.children[7].children[0].children.length, 0,
+      'Eighth element child has no decendants');
+    strictEqual(pager.children[8].children[0].children.length, 0,
+      'Ninth element child has no decendants');
+    //IDs
+    strictEqual(pager.children[0].id, testDiv.id + '_page_first');
+    strictEqual(pager.children[1].id, testDiv.id + '_page_prev');
+    strictEqual(pager.children[2].id, '');
+    strictEqual(pager.children[3].id, '');
+    strictEqual(pager.children[4].id, '');
+    strictEqual(pager.children[5].id, '');
+    strictEqual(pager.children[6].id, '');
+    strictEqual(pager.children[7].id, testDiv.id + '_page_next');
+    strictEqual(pager.children[8].id, testDiv.id + '_page_last');
+    //Text
+    strictEqual(pager.children[0].children[0].innerHTML, '');
+    strictEqual(pager.children[1].children[0].innerHTML, '');
+    strictEqual(pager.children[2].children[0].innerHTML, '6');
+    strictEqual(pager.children[3].children[0].innerHTML, '7');
+    strictEqual(pager.children[4].children[0].innerHTML, '8');
+    strictEqual(pager.children[5].children[0].innerHTML, '9');
+    strictEqual(pager.children[6].children[0].innerHTML, '10');
+    strictEqual(pager.children[7].children[0].innerHTML, '');
+    strictEqual(pager.children[8].children[0].innerHTML, '');
+    //Attributes
+    notOk(pager.children[0].getAttribute('disabled'), 'First is not disabled');
+    notOk(pager.children[1].getAttribute('disabled'), 'Prev is not disabled');
+    notOk(pager.children[2].getAttribute('disabled'), '6 is not disabled');
+    notOk(pager.children[3].getAttribute('disabled'), '7 is not disabled');
+    notOk(pager.children[4].getAttribute('disabled'), '8 is not disabled');
+    notOk(pager.children[5].getAttribute('disabled'), '9 is not disabled');
+    strictEqual(pager.children[6].getAttribute('disabled'), 'disabled',
+      '10 is disabled');
+    strictEqual(pager.children[7].getAttribute('disabled'), 'disabled',
+      'Next is disabled');
+    strictEqual(pager.children[8].getAttribute('disabled'), 'disabled',
+      'Last is disabled');
+    //Styles
+    var myTest = pager.style;
+    strictEqual(floatStyle(myTest), 'right');
+    strictEqual(pager.style.listStyleType, 'none');
+    strictEqual(pager.children[0].style.display, '');
+    strictEqual(pager.children[0].style.marginRight, '');
+    strictEqual(pager.children[1].style.display, '');
+    strictEqual(pager.children[1].style.marginRight, '');
+    strictEqual(pager.children[2].style.display, '');
+    strictEqual(pager.children[2].style.marginRight, '');
+    strictEqual(pager.children[3].style.display, '');
+    strictEqual(pager.children[3].style.marginRight, '');
+    strictEqual(pager.children[4].style.display, '');
+    strictEqual(pager.children[4].style.marginRight, '');
+    strictEqual(pager.children[5].style.display, '');
+    strictEqual(pager.children[5].style.marginRight, '');
+    strictEqual(pager.children[6].style.display, '');
+    strictEqual(pager.children[6].style.marginRight, '');
+    strictEqual(pager.children[7].style.display, '');
+    strictEqual(pager.children[7].style.marginRight, '');
+    strictEqual(pager.children[8].style.display, '');
+    strictEqual(pager.children[8].style.marginRight, '');
+    //Classes
+    strictEqual(pager.children[0].className,
+      'fg-button ui-button ui-state-default ui-corner-left table-page');
+    strictEqual(pager.children[0].children[0].className,
+      'ui-icon ui-icon-arrowthickstop-1-w');
+    strictEqual(pager.children[1].className,
+      'fg-button ui-button ui-state-default ui-corner-left table-page');
+    strictEqual(pager.children[1].children[0].className,
+      'ui-icon ui-icon-circle-arrow-w');
+    strictEqual(pager.children[2].className,
+    'fg-button ui-button ui-state-default ui-corner-left table-page');
+    strictEqual(pager.children[3].className,
+    'fg-button ui-button ui-state-default ui-corner-left table-page');
+    strictEqual(pager.children[4].className,
+    'fg-button ui-button ui-state-default ui-corner-left table-page');
+    strictEqual(pager.children[5].className,
+    'fg-button ui-button ui-state-default ui-corner-left table-page');
+    strictEqual(pager.children[6].className,
+    'fg-button ui-button ui-state-default ui-corner-left table-page');
+    strictEqual(pager.children[7].className,
+    'fg-button ui-button ui-state-default ' +
+    'ui-corner-left table-page ui-state-disabled');
+    strictEqual(pager.children[7].children[0].className,
+      'ui-icon ui-icon-circle-arrow-e');
+    strictEqual(pager.children[8].className,
+    'fg-button ui-button ui-state-default ui-corner-left table-page');
+    strictEqual(pager.children[8].children[0].className,
+      'ui-icon ui-icon-arrowthickstop-1-e');
+  }
+);
 
 module('Function Counts');
 test('Creating an Dable from Data', function() {
@@ -1276,7 +1831,7 @@ test('Dable Exists() returns true if Dable Exists', function() {
   var result = dable.Exists();
 
   //Then: we should get "true"
-  ok(result);
+  strictEqual(result, true);
 });
 test('Dable Exists() returns false if Dable doesnt exist', function() {
   //Given: an unbuilt dable
@@ -1286,7 +1841,7 @@ test('Dable Exists() returns false if Dable doesnt exist', function() {
   var result = dable.Exists();
 
   //Then: we should get "false"
-  notOk(result);
+  strictEqual(result, false);
 });
 test('Dable Exists(testDiv) returns true if Dable Exists', function() {
   //Given: a dable
@@ -1298,7 +1853,7 @@ test('Dable Exists(testDiv) returns true if Dable Exists', function() {
   var result = dable.Exists(testDiv);
 
   //Then: we should get "true"
-  ok(result);
+  strictEqual(result, true);
 });
 test('Dable Exists(testDiv) returns false if Dable doesnt exist', function() {
   //Given: an unbuilt dable
@@ -1308,7 +1863,7 @@ test('Dable Exists(testDiv) returns false if Dable doesnt exist', function() {
   var result = dable.Exists(testDiv);
 
   //Then: we should get "false"
-  notOk(result);
+  strictEqual(result, false);
 });
 test('Dable Exists($(testDiv)) returns true if Dable Exists', function() {
   //Given: a dable
@@ -1320,7 +1875,7 @@ test('Dable Exists($(testDiv)) returns true if Dable Exists', function() {
   var result = dable.Exists($(testDiv));
 
   //Then: we should get "true"
-  ok(result);
+  strictEqual(result, true);
 });
 test('Dable Exists($(testDiv)) returns false if Dable doesnt exist',
   function() {
@@ -1331,7 +1886,7 @@ test('Dable Exists($(testDiv)) returns false if Dable doesnt exist',
     var result = dable.Exists($(testDiv));
 
     //Then: we should get "false"
-    notOk(result);
+    strictEqual(result, false);
   }
 );
 test('Dable Exists(testDiv.id) returns true if Dable Exists', function() {
@@ -1344,7 +1899,7 @@ test('Dable Exists(testDiv.id) returns true if Dable Exists', function() {
   var result = dable.Exists(testDiv.id);
 
   //Then: we should get "true"
-  ok(result);
+  strictEqual(result, true);
 });
 test('Dable Exists(testDiv.id) returns false if Dable doesnt exist',
   function() {
@@ -1355,7 +1910,7 @@ test('Dable Exists(testDiv.id) returns false if Dable doesnt exist',
     var result = dable.Exists(testDiv.id);
 
     //Then: we should get "false"
-    notOk(result);
+    strictEqual(result, false);
   }
 );
 
@@ -1379,8 +1934,20 @@ test('Preselected Page Size Populates in the UI', function() {
 });
 
 module('Dable from HTML Tests');
+test('With no table the dable is not created', function() {
+  //Given: a dable
+  var dable = new Dable();
+
+  //When: we build the dable
+  dable.GenerateTableFromHtml();
+
+  //Then: we output an error message to the console and the dable doesn't exist
+  strictEqual(consoleErrorOutput, 'Dable Error: No HTML ' +
+    'table to generate dable from');
+  strictEqual(dable.Exists(), false, 'the dable doesn\'t exist');
+});
 test('With no thead the dable is not created', function() {
-  //Given: a dable made from a table with no thead element
+  //Given: a table with no thead element
   var dable = new Dable();
   var table = document.createElement('table');
   var tbody = document.createElement('tbody');
@@ -1401,13 +1968,10 @@ test('With no thead the dable is not created', function() {
   //When: we build the dable
   dable.BuildAll(testDiv.id);
 
-  //Then: we output an error message to the console
-  strictEqual(consoleOutput, 'Dable Error: No thead element in table',
+  //Then: we output an error message to the console and the dable doesn't exist
+  strictEqual(consoleErrorOutput, 'Dable Error: No thead element in table',
     'Output correct message to console.error');
-
-  //Then: the dable doesn't exist
-  // var dableHeader = document.getElementById(testDiv.id + '_header');
-  notOk(dable.Exists(), 'the dable doesn\'t exist');
+  strictEqual(dable.Exists(), false, 'the dable doesn\'t exist');
 });
 test('Creating a Dable from a jQuery table', function() {
   //Given: a table
@@ -1422,6 +1986,28 @@ test('Creating a Dable from a jQuery table', function() {
   strictEqual(testDiv.children.length, 3);
   var table = testDiv.querySelector('table');
   var footer = testDiv.children[2];
+  strictEqual(footer.children[0].children[0].innerHTML,
+    'Showing 1 to 10 of 20 entries');
+  strictEqual(table.children[1].children[0].children[0].innerHTML, '0');
+  strictEqual(table.children[1].children[0].children[1].innerHTML, '1');
+  strictEqual(table.children[1].children[0].children[2].innerHTML, '2');
+  strictEqual(table.children[1].children[0].children[3].innerHTML, '3');
+});
+test('Creating a Dable from a jQuery table without an id', function() {
+  //Given: a table
+  var bob = document.createElement('div');
+  testDiv.appendChild(bob);
+  makeSimpleTable(bob);
+
+  //When: we build the Dable
+  // eslint-disable-next-line no-unused-vars
+  var dable = new Dable($(bob)); // jshint ignore:line
+
+  //Then: we see the elements we expect
+  //Element pattern
+  strictEqual(bob.children.length, 3);
+  var table = bob.querySelector('table');
+  var footer = bob.children[2];
   strictEqual(footer.children[0].children[0].innerHTML,
     'Showing 1 to 10 of 20 entries');
   strictEqual(table.children[1].children[0].children[0].innerHTML, '0');
@@ -1488,7 +2074,7 @@ test('basic Dable search filter', function() {
   //Given: a table
   makeSimpleTable(testDiv);
 
-  //When: we make it a dable and click on a header
+  //When: we make it a dable and enter a search value
   // eslint-disable-next-line no-unused-vars
   var dable = new Dable(testDiv); // jshint ignore:line
   var table = testDiv.querySelector('table');
@@ -1553,4 +2139,257 @@ test('basic Dable custom ascending sort', function() {
   //Then: we see the elements we expect
   strictEqual(theadRow.children[3].children[1].innerText.charCodeAt(0), 9650);
   strictEqual(table.children[1].children[0].children[3].innerText, 'First');
+});
+test('basic Dable lexicographic fallback ascending sort', function() {
+  //Given: a Dable
+  makeCustomDable(testDiv);
+
+  //When: we click on a header
+  var table = testDiv.querySelector('table');
+  var theadRow = table.children[0].children[0];
+  theadRow.children[4].click();
+
+  //Then: we see the elements we expect
+  strictEqual(theadRow.children[4].children[1].innerText.charCodeAt(0), 9650);
+  strictEqual(table.children[1].children[0].children[4].innerText, '10 Bob');
+});
+test('Secondary sort should be ascending', function() {
+  //Given: a Dable sorted on column 5
+  makeCustomDable(testDiv);
+  var table = testDiv.querySelector('table');
+  var theadRow = table.children[0].children[0];
+  theadRow.children[4].click();
+
+  //When: we click on column 2 header
+  theadRow.children[1].click();
+
+  //Then: we see the elements we expect
+  strictEqual(theadRow.children[1].children[1].innerText.charCodeAt(0), 9650);
+  strictEqual(table.children[1].children[0].children[1].innerText, '1/1/2001');
+});
+test('Dable with style="bootstrap" integer ascending sort', function() {
+  //Given: a table
+  makeSimpleTable(testDiv);
+
+  //When: we make it a dable and click on a header
+  var dable = new Dable(testDiv);
+  dable.UpdateStyle(testDiv, 'bootstrap');
+  var table = testDiv.querySelector('table');
+  var theadRow = table.children[0].children[0];
+  theadRow.children[0].children[0].click();
+
+  //Then: we see the elements we expect
+  strictEqual(theadRow.children[0].children[1].className,
+    'table-sort glyphicon glyphicon-chevron-up');
+  strictEqual(table.children[1].children[0].children[0].innerText, '0');
+});
+test('Dable with style="bootstrap" integer decending sort', function() {
+  //Given: a table
+  makeSimpleTable(testDiv);
+
+  //When: we make it a dable and click on a header
+  var dable = new Dable(testDiv);
+  dable.UpdateStyle(testDiv, 'bootstrap');
+  var table = testDiv.querySelector('table');
+  var theadRow = table.children[0].children[0];
+  theadRow.children[0].children[0].click();
+  theadRow.children[0].children[0].click();
+
+  //Then: we see the elements we expect
+  strictEqual(theadRow.children[0].children[1].className,
+    'table-sort glyphicon glyphicon-chevron-down');
+  strictEqual(table.children[1].children[0].children[0].innerText, '19');
+});
+test('Dable with style="JqueryUI" integer ascending sort', function() {
+  //Given: a table
+  makeSimpleTable(testDiv);
+
+  //When: we make it a dable and click on a header
+  var dable = new Dable(testDiv);
+  dable.UpdateStyle(testDiv, 'JqueryUI');
+  var table = testDiv.querySelector('table');
+  var theadRow = table.children[0].children[0];
+  theadRow.children[0].children[0].click();
+
+  //Then: we see the elements we expect
+  strictEqual(theadRow.children[0].children[1].className,
+    'table-sort ui-icon ui-icon-triangle-1-n');
+  strictEqual(table.children[1].children[0].children[0].innerText, '0');
+});
+test('Dable with style="JqueryUI" integer decending sort', function() {
+  //Given: a table
+  makeSimpleTable(testDiv);
+
+  //When: we make it a dable and click on a header
+  var dable = new Dable(testDiv);
+  dable.UpdateStyle(testDiv, 'JqueryUI');
+  var table = testDiv.querySelector('table');
+  var theadRow = table.children[0].children[0];
+  theadRow.children[0].children[0].click();
+  theadRow.children[0].children[0].click();
+
+  //Then: we see the elements we expect
+  strictEqual(theadRow.children[0].children[1].className,
+    'table-sort ui-icon ui-icon-triangle-1-s');
+  strictEqual(table.children[1].children[0].children[0].innerText, '19');
+});
+
+module('Dable Manipulation Tests');
+test('Empty Dable looks right', function() {
+  //Given: Nothing
+  //When: we create an empty Dable
+  var dable = new Dable(testDiv);
+  var columns = ['Odd', 'Even'];
+  dable.SetColumnNames(columns);
+  dable.BuildAll(testDiv);
+
+  //Then: we see the elements we expect
+  //Element pattern
+  strictEqual(testDiv.children.length, 3);
+  var header = testDiv.children[0];
+  var pageSize = header.children[0];
+  var pageSelect = pageSize.children[1];
+  var search = header.children[1];
+  var table = testDiv.querySelector('table');
+  var headRow = table.children[0].children[0];
+  var tbody = table.children[1];
+  var footer = testDiv.children[2];
+  var pager = footer.children[1];
+  strictEqual(header.children.length, 3);
+  strictEqual(pageSize.children.length, 2);
+  strictEqual(pageSize.children[0].children.length, 0);
+  strictEqual(pageSelect.children.length, 4);
+  strictEqual(pageSelect.children[0].children.length, 0);
+  strictEqual(pageSelect.children[1].children.length, 0);
+  strictEqual(pageSelect.children[2].children.length, 0);
+  strictEqual(pageSelect.children[3].children.length, 0);
+  strictEqual(search.children.length, 2);
+  strictEqual(search.children[0].children.length, 0);
+  strictEqual(search.children[1].children.length, 0);
+  strictEqual(header.children[2].children.length, 0);
+  strictEqual(footer.children.length, 3);
+  strictEqual(footer.children[0].children.length, 1);
+  strictEqual(footer.children[0].children[0].children.length, 0);
+  strictEqual(pager.children.length, 2);
+  strictEqual(pager.children[0].children.length, 1);
+  strictEqual(pager.children[0].children[0].children.length, 0);
+  strictEqual(pager.children[1].children.length, 1);
+  strictEqual(pager.children[1].children[0].children.length, 0);
+  strictEqual(footer.children[2].children.length, 0);
+  strictEqual(table.children.length, 2);
+  strictEqual(table.children[0].children.length, 1);
+  strictEqual(headRow.children.length, 2);
+  strictEqual(headRow.children[0].children.length, 3);
+  strictEqual(headRow.children[1].children.length, 3);
+  strictEqual(headRow.children[0].children[0].children.length, 0);
+  strictEqual(headRow.children[1].children[0].children.length, 0);
+  strictEqual(headRow.children[0].children[1].children.length, 0);
+  strictEqual(headRow.children[1].children[1].children.length, 0);
+  strictEqual(headRow.children[0].children[2].children.length, 0);
+  strictEqual(headRow.children[1].children[2].children.length, 0);
+  strictEqual(tbody.children.length, 0);
+  //IDs
+  strictEqual(header.id, testDiv.id + '_header');
+  strictEqual(footer.id, testDiv.id + '_footer');
+  strictEqual(search.children[1].id, testDiv.id + '_search');
+  strictEqual(footer.children[0].children[0].id, testDiv.id + '_showing');
+  strictEqual(pager.children[0].id, testDiv.id + '_page_prev');
+  strictEqual(pager.children[1].id, testDiv.id + '_page_next');
+  strictEqual(tbody.id, testDiv.id + '_body');
+  //Text
+  strictEqual(pageSize.children[0].innerHTML, 'Show ');
+  strictEqual(search.children[0].innerHTML, 'Search ');
+  strictEqual(footer.children[0].children[0].innerHTML,
+    'There are no entries');
+  strictEqual(pageSelect.children[0].innerHTML, '10');
+  strictEqual(pageSelect.children[1].innerHTML, '25');
+  strictEqual(pageSelect.children[2].innerHTML, '50');
+  strictEqual(pageSelect.children[3].innerHTML, '100');
+  strictEqual(pager.children[0].children[0].innerHTML, 'Prev');
+  strictEqual(pager.children[1].children[0].innerHTML, 'Next');
+  strictEqual(headRow.children[0].children[0].innerHTML, 'Odd ');
+  strictEqual(headRow.children[1].children[0].innerHTML, 'Even ');
+});
+test('Add row to empty Dable looks right', function() {
+  //Given: Nothing
+  //When: we create an empty Dable and add a row
+  var dable = new Dable(testDiv);
+  var columns = ['Odd', 'Even'];
+  dable.SetColumnNames(columns);
+  dable.BuildAll(testDiv);
+  dable.AddRow([24, 36]);
+
+  //Then: we see the elements we expect
+  //Element pattern
+  strictEqual(testDiv.children.length, 3);
+  var table = testDiv.querySelector('table');
+  var tbody = table.children[1];
+  var footer = testDiv.children[2];
+  strictEqual(footer.children.length, 3);
+  strictEqual(footer.children[0].children.length, 1);
+  strictEqual(footer.children[0].children[0].children.length, 0);
+  strictEqual(table.children.length, 2);
+  strictEqual(tbody.children.length, 1);
+  strictEqual(tbody.children[0].children.length, 2);
+  //Text
+  strictEqual(tbody.children[0].children[0].innerHTML, '24');
+  strictEqual(tbody.children[0].children[1].innerHTML, '36');
+  strictEqual(footer.children[0].children[0].innerHTML,
+    'Showing 1 to 1 of 1 entries');
+});
+test('Add 2 rows to empty Dable looks right', function() {
+  //Given: Nothing
+  //When: we create an empty Dable and add 2 rows
+  var dable = new Dable(testDiv);
+  var columns = ['Odd', 'Even'];
+  dable.SetColumnNames(columns);
+  dable.BuildAll(testDiv);
+  dable.AddRow([24, 36]);
+  dable.AddRow([48, 60]);
+
+  //Then: we see the elements we expect
+  //Element pattern
+  strictEqual(testDiv.children.length, 3);
+  var table = testDiv.querySelector('table');
+  var tbody = table.children[1];
+  var footer = testDiv.children[2];
+  strictEqual(footer.children.length, 3);
+  strictEqual(footer.children[0].children.length, 1);
+  strictEqual(footer.children[0].children[0].children.length, 0);
+  strictEqual(table.children.length, 2);
+  strictEqual(tbody.children.length, 2);
+  strictEqual(tbody.children[0].children.length, 2);
+  strictEqual(tbody.children[1].children.length, 2);
+  //Text
+  strictEqual(tbody.children[0].children[0].innerHTML, '24');
+  strictEqual(tbody.children[0].children[1].innerHTML, '36');
+  strictEqual(tbody.children[1].children[0].innerHTML, '48');
+  strictEqual(tbody.children[1].children[1].innerHTML, '60');
+  strictEqual(footer.children[0].children[0].innerHTML,
+    'Showing 1 to 2 of 2 entries');
+});
+test('Delete row from Dable looks right', function() {
+  //Given: a Dable with two rows
+  var dable = makePagerDable(testDiv);
+
+  //When: we delete a row
+  dable.DeleteRow(1);
+
+  //Then: we see the elements we expect
+  //Element pattern
+  strictEqual(testDiv.children.length, 3);
+  var table = testDiv.querySelector('table');
+  var tbody = table.children[1];
+  var footer = testDiv.children[2];
+  strictEqual(footer.children.length, 3);
+  strictEqual(footer.children[0].children.length, 1);
+  strictEqual(footer.children[0].children[0].children.length, 0);
+  strictEqual(table.children.length, 2);
+  strictEqual(tbody.children.length, 1);
+  strictEqual(tbody.children[0].children.length, 2);
+  //Text
+  strictEqual(tbody.children[0].children[0].innerHTML, '1');
+  strictEqual(tbody.children[0].children[1].innerHTML, '2');
+  strictEqual(footer.children[0].children[0].innerHTML,
+    'Showing 1 to 1 of 9 entries');
 });

@@ -149,6 +149,7 @@ module.exports = {
     'multiline-ternary': ['off'],
     'new-cap': ['error', {
       capIsNewExceptions: [
+        'AddRow',
         'ApplyBaseStyles',
         'ApplyBootstrapStyles',
         'ApplyJqueryUIStyles',
@@ -162,6 +163,7 @@ module.exports = {
         'CreateRowsFromObjects',
         'CustomRendering',
         'CustomSortFunc',
+        'DeleteRow',
         'Exists',
         'GenerateTableFromHtml',
         'GoToPage',
