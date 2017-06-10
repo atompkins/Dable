@@ -293,11 +293,13 @@ test('Dable defaults are empty, not null', function() {
     'ApplyBootstrapStyles return false');
   strictEqual(dable.ApplyJqueryUIStyles(), false,
     'ApplyJqueryUIStyles return false');
+  strictEqual(dable.BuildAll('bogus'), false, 'BuildAll return false');
   strictEqual(dable.BuildFooter(), false, 'BuildFooter return false');
   strictEqual(dable.BuildHeader(), false, 'BuildHeader return false');
   strictEqual(dable.BuildTable(), false, 'BuildTable return false');
   strictEqual(dable.searchFunc({id: 'test'}), false, 'searchFunc return false');
   strictEqual(dable.SetColumnNames(), false, 'SetColumnNames returns false');
+  strictEqual(dable.SetDataAsColumns(), false, 'SetDataAsColumns return false');
   strictEqual(dable.SetDataAsRows(), false, 'SetDataAsRows return false');
   strictEqual(dable.UpdateDisplayedRows(), false,
     'UpdateDisplayedRows return false');
@@ -324,6 +326,19 @@ test('Dable Pager goes backward', function() {
   makeSimpleTable(testDiv);
   var dable = new Dable(testDiv.id);
   testDiv.children[2].children[1].children[1].children[0].click();
+
+  //When: we call page backward and check the first cell of the table
+  testDiv.children[2].children[1].children[0].children[0].click();
+  var firstCell = testDiv.querySelector('td');
+
+  //Then: we see the first page
+  strictEqual(dable.pageNumber, 0, 'Current page is 0');
+  strictEqual(firstCell.innerHTML, '0', 'First cell contains 0');
+});
+test('Dable Pager does not go backward from page 1', function() {
+  //Given: a table made into a Dable with more than 1 page
+  makeSimpleTable(testDiv);
+  var dable = new Dable(testDiv.id);
 
   //When: we call page backward and check the first cell of the table
   testDiv.children[2].children[1].children[0].children[0].click();
@@ -425,6 +440,41 @@ test('Dable multi page Pager First button works', function() {
   notOk(pager.children[7].getAttribute('disabled'), 'Next is not disabled');
   notOk(pager.children[8].getAttribute('disabled'), 'Last is not disabled');
 });
+test('Dable multi page Pager for very small table', function() {
+  //Given: an empty dable, and some data for our Dable
+  var dable = new Dable();
+  var data = [[1, 2], [3, 4]];
+  var columns = ['Odd', 'Even'];
+  dable.SetDataAsRows(data);
+  dable.SetColumnNames(columns);
+  dable.pagerSize = 5;
+  dable.pagerIncludeFirstAndLast = true;
+
+  //When: we build the Dable
+  dable.BuildAll(testDiv.id);
+
+  //Then: we see the elements we expect
+  var pager = testDiv.children[2].children[1];
+  //Element pattern
+  strictEqual(pager.children.length, 5, 'Pager has 5 elements');
+  //Text
+  strictEqual(pager.children[0].children[0].innerHTML, 'First');
+  strictEqual(pager.children[1].children[0].innerHTML, 'Prev');
+  strictEqual(pager.children[2].children[0].innerHTML, '1');
+  strictEqual(pager.children[3].children[0].innerHTML, 'Next');
+  strictEqual(pager.children[4].children[0].innerHTML, 'Last');
+  //Attributes
+  strictEqual(pager.children[0].getAttribute('disabled'), 'disabled',
+    'First is disabled');
+  strictEqual(pager.children[1].getAttribute('disabled'), 'disabled',
+    'Prev is disabled');
+  strictEqual(pager.children[2].getAttribute('disabled'), 'disabled',
+    '1 is disabled');
+  strictEqual(pager.children[3].getAttribute('disabled'), 'disabled',
+    'Next is disabled');
+  strictEqual(pager.children[4].getAttribute('disabled'), 'disabled',
+    'Last is disabled');
+});
 
 module('Style Tests');
 test('Dable with style="none" has basic elements', function() {
@@ -434,6 +484,183 @@ test('Dable with style="none" has basic elements', function() {
   //When: we make it a dable
   // eslint-disable-next-line no-unused-vars
   var dable = new Dable(testDiv.id); // jshint ignore:line
+
+  //Then: we see the elements we expect
+  //Element pattern
+  strictEqual(testDiv.children.length, 3);
+  var header = testDiv.children[0];
+  var pageSize = header.children[0];
+  var pageSelect = pageSize.children[1];
+  var search = header.children[1];
+  var table = testDiv.querySelector('table');
+  var headRow = table.children[0].children[0];
+  var tbody = table.children[1];
+  var footer = testDiv.children[2];
+  var pager = footer.children[1];
+  strictEqual(header.children.length, 3);
+  strictEqual(pageSize.children.length, 2);
+  strictEqual(pageSize.children[0].children.length, 0);
+  strictEqual(pageSelect.children.length, 4);
+  strictEqual(pageSelect.children[0].children.length, 0);
+  strictEqual(pageSelect.children[1].children.length, 0);
+  strictEqual(pageSelect.children[2].children.length, 0);
+  strictEqual(pageSelect.children[3].children.length, 0);
+  strictEqual(search.children.length, 2);
+  strictEqual(search.children[0].children.length, 0);
+  strictEqual(search.children[1].children.length, 0);
+  strictEqual(header.children[2].children.length, 0);
+  strictEqual(footer.children.length, 3);
+  strictEqual(footer.children[0].children.length, 1);
+  strictEqual(footer.children[0].children[0].children.length, 0);
+  strictEqual(pager.children.length, 2);
+  strictEqual(pager.children[0].children.length, 1);
+  strictEqual(pager.children[0].children[0].children.length, 0);
+  strictEqual(pager.children[1].children.length, 1);
+  strictEqual(pager.children[1].children[0].children.length, 0);
+  strictEqual(footer.children[2].children.length, 0);
+  strictEqual(table.children.length, 2);
+  strictEqual(table.children[0].children.length, 1);
+  strictEqual(headRow.children.length, 4);
+  strictEqual(headRow.children[0].children.length, 3);
+  strictEqual(headRow.children[1].children.length, 3);
+  strictEqual(headRow.children[2].children.length, 3);
+  strictEqual(headRow.children[3].children.length, 3);
+  strictEqual(headRow.children[0].children[0].children.length, 0);
+  strictEqual(headRow.children[1].children[0].children.length, 0);
+  strictEqual(headRow.children[2].children[0].children.length, 0);
+  strictEqual(headRow.children[3].children[0].children.length, 0);
+  strictEqual(headRow.children[0].children[1].children.length, 0);
+  strictEqual(headRow.children[1].children[1].children.length, 0);
+  strictEqual(headRow.children[2].children[1].children.length, 0);
+  strictEqual(headRow.children[3].children[1].children.length, 0);
+  strictEqual(headRow.children[0].children[2].children.length, 0);
+  strictEqual(headRow.children[1].children[2].children.length, 0);
+  strictEqual(headRow.children[2].children[2].children.length, 0);
+  strictEqual(headRow.children[3].children[2].children.length, 0);
+  strictEqual(tbody.children.length, 10);
+  strictEqual(tbody.children[0].children.length, 4);
+  strictEqual(tbody.children[0].children[0].children.length, 0);
+  strictEqual(tbody.children[0].children[1].children.length, 0);
+  strictEqual(tbody.children[0].children[2].children.length, 0);
+  strictEqual(tbody.children[0].children[3].children.length, 0);
+  //IDs
+  strictEqual(header.id, testDiv.id + '_header');
+  strictEqual(footer.id, testDiv.id + '_footer');
+  strictEqual(search.children[1].id, testDiv.id + '_search');
+  strictEqual(footer.children[0].children[0].id, testDiv.id + '_showing');
+  strictEqual(pager.children[0].id, testDiv.id + '_page_prev');
+  strictEqual(pager.children[1].id, testDiv.id + '_page_next');
+  strictEqual(tbody.id, testDiv.id + '_body');
+  //Text
+  strictEqual(pageSize.children[0].innerHTML, 'Show ');
+  strictEqual(search.children[0].innerHTML, 'Search ');
+  strictEqual(footer.children[0].children[0].innerHTML,
+    'Showing 1 to 10 of 20 entries');
+  strictEqual(pageSelect.children[0].innerHTML, '10');
+  strictEqual(pageSelect.children[1].innerHTML, '25');
+  strictEqual(pageSelect.children[2].innerHTML, '50');
+  strictEqual(pageSelect.children[3].innerHTML, '100');
+  strictEqual(pager.children[0].children[0].innerHTML, 'Prev');
+  strictEqual(pager.children[1].children[0].innerHTML, 'Next');
+  strictEqual(headRow.children[0].children[0].innerHTML, 'Column 0 ');
+  strictEqual(headRow.children[1].children[0].innerHTML, 'Column 1 ');
+  strictEqual(headRow.children[2].children[0].innerHTML, 'Column 2 ');
+  strictEqual(headRow.children[3].children[0].innerHTML, 'Column 3 ');
+  strictEqual(tbody.children[0].children[0].innerHTML, '0');
+  strictEqual(tbody.children[0].children[1].innerHTML, '1');
+  strictEqual(tbody.children[0].children[2].innerHTML, '2');
+  strictEqual(tbody.children[0].children[3].innerHTML, '3');
+  //Values
+  strictEqual(pageSelect.children[0].value, '10');
+  strictEqual(pageSelect.children[1].value, '25');
+  strictEqual(pageSelect.children[2].value, '50');
+  strictEqual(pageSelect.children[3].value, '100');
+  //Styles
+  strictEqual(table.style.width, '100%');
+  strictEqual(header.style.padding, '5px');
+  strictEqual(footer.style.padding, '5px');
+  var myTest = pageSize.style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = search.style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(header.children[2].style.clear, 'both');
+  myTest = footer.children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = pager.style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(pager.style.listStyleType, 'none');
+  strictEqual(footer.children[2].style.clear, 'both');
+  strictEqual(pager.children[0].style.display, 'inline');
+  strictEqual(pager.children[1].style.display, 'inline');
+  strictEqual(pager.children[0].style.marginRight, '5px');
+  strictEqual(pager.children[1].style.marginRight, '5px');
+  strictEqual(headRow.children[0].style.padding, '5px');
+  strictEqual(headRow.children[1].style.padding, '5px');
+  strictEqual(headRow.children[2].style.padding, '5px');
+  strictEqual(headRow.children[3].style.padding, '5px');
+  myTest = headRow.children[0].children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[0].children[1].style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(headRow.children[0].children[2].style.clear, 'both');
+  myTest = headRow.children[1].children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[1].children[1].style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(headRow.children[1].children[2].style.clear, 'both');
+  myTest = headRow.children[2].children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[2].children[1].style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(headRow.children[2].children[2].style.clear, 'both');
+  myTest = headRow.children[3].children[0].style;
+  strictEqual(floatStyle(myTest), 'left');
+  myTest = headRow.children[3].children[1].style;
+  strictEqual(floatStyle(myTest), 'right');
+  strictEqual(headRow.children[3].children[2].style.clear, 'both');
+  strictEqual(rgb2hex(tbody.children[0].style.backgroundColor), '#e2e4ff');
+  strictEqual(tbody.children[1].style.backgroundColor, 'white');
+  strictEqual(rgb2hex(tbody.children[2].style.backgroundColor), '#e2e4ff');
+  strictEqual(tbody.children[3].style.backgroundColor, 'white');
+  strictEqual(rgb2hex(tbody.children[4].style.backgroundColor), '#e2e4ff');
+  strictEqual(tbody.children[5].style.backgroundColor, 'white');
+  strictEqual(rgb2hex(tbody.children[6].style.backgroundColor), '#e2e4ff');
+  strictEqual(tbody.children[7].style.backgroundColor, 'white');
+  strictEqual(rgb2hex(tbody.children[8].style.backgroundColor), '#e2e4ff');
+  strictEqual(tbody.children[9].style.backgroundColor, 'white');
+  strictEqual(tbody.children[0].children[0].style.padding, '5px');
+  strictEqual(tbody.children[0].children[1].style.padding, '5px');
+  strictEqual(tbody.children[0].children[2].style.padding, '5px');
+  strictEqual(tbody.children[0].children[3].style.padding, '5px');
+  //Classes
+  strictEqual(pager.children[0].className, 'table-page');
+  strictEqual(pager.children[1].className, 'table-page');
+  strictEqual(headRow.children[0].children[1].className, 'table-sort');
+  strictEqual(headRow.children[1].children[1].className, 'table-sort');
+  strictEqual(headRow.children[2].children[1].className, 'table-sort');
+  strictEqual(headRow.children[3].children[1].className, 'table-sort');
+  strictEqual(tbody.children[0].className, 'table-row-even');
+  strictEqual(tbody.children[1].className, 'table-row-odd');
+  strictEqual(tbody.children[2].className, 'table-row-even');
+  strictEqual(tbody.children[3].className, 'table-row-odd');
+  strictEqual(tbody.children[4].className, 'table-row-even');
+  strictEqual(tbody.children[5].className, 'table-row-odd');
+  strictEqual(tbody.children[6].className, 'table-row-even');
+  strictEqual(tbody.children[7].className, 'table-row-odd');
+  strictEqual(tbody.children[8].className, 'table-row-even');
+  strictEqual(tbody.children[9].className, 'table-row-odd');
+  //State
+  strictEqual(pager.children[0].getAttribute('disabled'),
+    'disabled');
+});
+test('Dable with style="bogus" is the same as "none"', function() {
+  //Given: a table
+  makeSimpleTable(testDiv);
+
+  //When: we make it a dable
+  var dable = new Dable(testDiv.id);
+  dable.style = 'bogus';
+  dable.UpdateStyle();
 
   //Then: we see the elements we expect
   //Element pattern
@@ -1760,6 +1987,80 @@ test('Dable multi page Pager with style="JqueryUI" Last page looks right',
       'ui-icon ui-icon-arrowthickstop-1-e');
   }
 );
+test('Dable with style="bootstrap" sort disabled col 1', function() {
+  //Given: a table
+  makeSimpleTable(testDiv);
+
+  //When: we make it a dable and disable sorting on column 1
+  var dable = new Dable(testDiv);
+  dable.columnData[1].CustomSortFunc = false;
+  dable.BuildAll(testDiv);
+  dable.UpdateStyle(testDiv, 'bootstrap');
+  var table = testDiv.querySelector('table');
+  var headRow = table.children[0].children[0];
+
+  //Then: we see the elements we expect
+  strictEqual(headRow.children[1].children.length, 2);
+});
+test('Dable with style="JqueryUI" sort disabled col 1', function() {
+  //Given: a table
+  makeSimpleTable(testDiv);
+
+  //When: we make it a dable and disable sorting on column 1
+  var dable = new Dable(testDiv);
+  dable.columnData[1].CustomSortFunc = false;
+  dable.BuildAll(testDiv);
+  dable.UpdateStyle(testDiv, 'JqueryUI');
+  var table = testDiv.querySelector('table');
+  var headRow = table.children[0].children[0];
+
+  //Then: we see the elements we expect
+  strictEqual(headRow.children[1].children.length, 2);
+});
+test('Dable with footer looks right', function() {
+  //Given: a table with a footer
+  testDiv.insertAdjacentHTML('beforeend', '<table>' +
+    '<thead><tr><th>Odd</th><th>Even</th></tr></thead>' +
+    '<tbody><tr><td>1</td><td>2</td></tr>' +
+    '<tr><td>3</td><td>4</td></tr></tbody>' +
+    '<tfoot><tr><td colspan="2">Some footer text</td></tr></tfoot>' +
+    '</table>');
+
+  //When: we make it a dable
+  // eslint-disable-next-line no-unused-vars
+  var dable = new Dable(testDiv); // jshint ignore:line
+
+  //Then: we see the elements we expect
+  //Element pattern
+  var table = testDiv.querySelector('table');
+  strictEqual(table.children.length, 3);
+  var tfoot = table.children[2];
+  strictEqual(tfoot.children.length, 1);
+  var tfRow = tfoot.children[0];
+  strictEqual(tfRow.children.length, 1);
+  strictEqual(tfRow.children[0].innerHTML, 'Some footer text');
+});
+test('Dable custom classes looks right', function() {
+  //Given: a table with custom classes
+  testDiv.insertAdjacentHTML('beforeend', '<div id="TableDable" ' +
+    'class="WhiteOnBlack"><table class="NoBorders"><thead><tr><th>Odd</th>' +
+    '<th>Even</th></tr></thead><tbody><tr class="Green"><td>1</td>' +
+    '<td>2</td></tr><tr class="Blue"><td>3</td><td>4</td></tr></tbody>' +
+    '</table></div>');
+
+  //When: we make it a dable and disable sorting on column 1
+  // eslint-disable-next-line no-unused-vars
+  var dable = new Dable('TableDable'); // jshint ignore:line
+
+  //Then: we see the elements we expect
+  var tableDable = document.getElementById('TableDable');
+  strictEqual(tableDable.className, 'WhiteOnBlack');
+  var table = testDiv.querySelector('table');
+  strictEqual(table.className, 'NoBorders');
+  var tbody = table.children[1];
+  strictEqual(tbody.children[0].className, 'Green');
+  strictEqual(tbody.children[1].className, 'Blue');
+});
 
 module('Function Counts');
 test('Creating an Dable from Data', function() {
@@ -1913,6 +2214,18 @@ test('Dable Exists(testDiv.id) returns false if Dable doesnt exist',
     strictEqual(result, false);
   }
 );
+test('Dable GetPageForRow returns strange value', function() {
+  //Given: a dable
+  var dable = new Dable();
+  makeSimpleTable(testDiv);
+  dable.BuildAll(testDiv.id);
+
+  //When: we call dable.GetPageForRow(0);
+  var actual = dable.GetPageForRow(0);
+
+  //Then: we get 0
+  strictEqual(actual, 0);
+});
 
 module('Header Tests');
 test('Preselected Page Size Populates in the UI', function() {
@@ -1931,6 +2244,29 @@ test('Preselected Page Size Populates in the UI', function() {
   strictEqual(Number(
     pageSizeDropDown.options[pageSizeDropDown.selectedIndex].value),
     selectedPageSize);
+});
+test('Changing the page size looks ok', function() {
+  //Given: a dable
+  var dable = new Dable();
+  makeSimpleTable(testDiv);
+
+  //When: we build the dable and change the page size
+  var selectedPageSize = 25;
+  dable.BuildAll(testDiv.id);
+  var pageSize = testDiv.querySelector('select');
+  pageSize.value = selectedPageSize;
+  triggerEvent(pageSize, 'change');
+
+  //Then: the dropdown value equals the selected page size
+  var header = document.getElementById(testDiv.id + '_header');
+  var pageSizeDropDown = header.querySelector('select');
+  strictEqual(Number(
+    pageSizeDropDown.options[pageSizeDropDown.selectedIndex].value),
+    selectedPageSize);
+  var footer = testDiv.children[2];
+  var indx = footer.children[0].children[0].innerText
+    .indexOf('Showing 1 to 20 of 20 entries');
+  strictEqual(indx, 0);
 });
 
 module('Dable from HTML Tests');
@@ -2015,8 +2351,6 @@ test('Creating a Dable from a jQuery table without an id', function() {
   strictEqual(table.children[1].children[0].children[2].innerHTML, '2');
   strictEqual(table.children[1].children[0].children[3].innerHTML, '3');
 });
-
-module('Dable from nested HTML Tests');
 test('basic Dable from nested HTML looks right', function() {
   //Given: a table
   var innerDiv = makeNestedTable(testDiv);
@@ -2084,6 +2418,75 @@ test('basic Dable search filter', function() {
 
   //Then: we see the elements we expect
   strictEqual(table.children[1].children[0].children[0].innerText, '8');
+});
+test('basic Dable search filter with no results', function() {
+  //Given: a table
+  makeSimpleTable(testDiv);
+
+  //When: we make it a dable and enter a search value
+  // eslint-disable-next-line no-unused-vars
+  var dable = new Dable(testDiv); // jshint ignore:line
+  var search = testDiv.children[0].children[1].children[1];
+  search.value = '111';
+  triggerEvent(search, 'keyup');
+
+  //Then: we see the elements we expect
+  var footer = testDiv.children[2];
+  var indx = footer.children[0].children[0].innerText
+    .indexOf('Showing 0 entries');
+  strictEqual(indx, 0);
+});
+test('basic Dable alpha search filter with extra spaces', function() {
+  //Given: a Dable
+  var dable = new Dable();
+  var data = [
+    ['Araldo Horsley', 'Araldo Sells'],
+    ['Bartlett Kilfeder', 'Bartlett Muzzullo'],
+    ['Berthe Konrad', 'Berthe Roseaman'],
+    ['Bethanne Findlow', 'Bethanne McVicar'],
+    ['Bethanne Moynham', 'Bliss Boor']
+  ];
+  var columns = ['Odd', 'Even'];
+  dable.SetDataAsRows(data);
+  dable.SetColumnNames(columns);
+  dable.BuildAll(testDiv);
+
+  //When: we enter a search value
+  var search = testDiv.children[0].children[1].children[1];
+  search.value = '  Bethanne   McVicar  ';
+  triggerEvent(search, 'keyup');
+
+  //Then: we see the elements we expect
+  var footer = testDiv.children[2];
+  var indx = footer.children[0].children[0].innerText
+    .indexOf('Showing 1 to 2 of 2 entries');
+  strictEqual(indx, 0);
+});
+test('basic Dable phrase search filter', function() {
+  //Given: a Dable
+  var dable = new Dable();
+  var data = [
+    ['Araldo Horsley', 'Araldo Sells'],
+    ['Bartlett Kilfeder', 'Bartlett Muzzullo'],
+    ['Berthe Konrad', 'Berthe Roseaman'],
+    ['Bethanne Findlow', 'Bethanne McVicar'],
+    ['Bethanne Moynham', 'Bliss Boor']
+  ];
+  var columns = ['Odd', 'Even'];
+  dable.SetDataAsRows(data);
+  dable.SetColumnNames(columns);
+  dable.BuildAll(testDiv);
+
+  //When: we enter a search value
+  var search = testDiv.children[0].children[1].children[1];
+  search.value = '"Bethanne McVicar"';
+  triggerEvent(search, 'keyup');
+
+  //Then: we see the elements we expect
+  var footer = testDiv.children[2];
+  var indx = footer.children[0].children[0].innerText
+    .indexOf('Showing 1 to 1 of 1 entries');
+  strictEqual(indx, 0);
 });
 test('Ascending sort column 2 with sort disabled column 1', function() {
   //Given: a Dable with sorting turned off on column 1
@@ -2173,6 +2576,7 @@ test('Dable with style="bootstrap" integer ascending sort', function() {
 
   //When: we make it a dable and click on a header
   var dable = new Dable(testDiv);
+  dable.BuildAll(testDiv);
   dable.UpdateStyle(testDiv, 'bootstrap');
   var table = testDiv.querySelector('table');
   var theadRow = table.children[0].children[0];
@@ -2206,6 +2610,7 @@ test('Dable with style="JqueryUI" integer ascending sort', function() {
 
   //When: we make it a dable and click on a header
   var dable = new Dable(testDiv);
+  dable.BuildAll(testDiv);
   dable.UpdateStyle(testDiv, 'JqueryUI');
   var table = testDiv.querySelector('table');
   var theadRow = table.children[0].children[0];
@@ -2232,6 +2637,33 @@ test('Dable with style="JqueryUI" integer decending sort', function() {
   strictEqual(theadRow.children[0].children[1].className,
     'table-sort ui-icon ui-icon-triangle-1-s');
   strictEqual(table.children[1].children[0].children[0].innerText, '19');
+});
+test('Dable mouseover header changes pointer', function() {
+  //Given: a table
+  makeSimpleTable(testDiv);
+
+  //When: we make it a dable and mouseover a header
+  // eslint-disable-next-line no-unused-vars
+  var dable = new Dable(testDiv); // jshint ignore:line
+  var th = testDiv.querySelector('th');
+  triggerEvent(th, 'mouseover');
+
+  //Then: we see the elements we expect
+  strictEqual(th.style.cursor, 'pointer');
+});
+test('Dable mouseout header changes pointer', function() {
+  //Given: a table
+  makeSimpleTable(testDiv);
+
+  //When: we make it a dable, mouseover a header and mouseout
+  // eslint-disable-next-line no-unused-vars
+  var dable = new Dable(testDiv); // jshint ignore:line
+  var th = testDiv.querySelector('th');
+  triggerEvent(th, 'mouseover');
+  triggerEvent(th, 'mouseout');
+
+  //Then: we see the elements we expect
+  strictEqual(th.style.cursor, 'default');
 });
 
 module('Dable Manipulation Tests');
@@ -2392,4 +2824,54 @@ test('Delete row from Dable looks right', function() {
   strictEqual(tbody.children[0].children[1].innerHTML, '2');
   strictEqual(footer.children[0].children[0].innerHTML,
     'Showing 1 to 1 of 9 entries');
+});
+test('Creating a Dable from Column Data', function() {
+  //Given: an empty dable, and some data for our Dable
+  var dable = new Dable();
+  var data = [[1, 2], [3, 4]];
+  var columns = ['Odd', 'Even'];
+  dable.SetDataAsColumns(data);
+  dable.SetColumnNames(columns);
+
+  //When: we build the Dable
+  dable.BuildAll(testDiv.id);
+
+  //Then: we see the elements we expect
+  //Element pattern
+  strictEqual(testDiv.children.length, 3);
+  var table = testDiv.querySelector('table');
+  strictEqual(table.children.length, 2);
+  var tbody = table.children[1];
+  strictEqual(tbody.children.length, 2);
+  strictEqual(tbody.children[0].children.length, 2);
+  strictEqual(tbody.children[0].children[0].children.length, 0);
+  strictEqual(tbody.children[0].children[1].children.length, 0);
+  strictEqual(tbody.children[1].children.length, 2);
+  strictEqual(tbody.children[1].children[0].children.length, 0);
+  strictEqual(tbody.children[1].children[1].children.length, 0);
+  //Text
+  strictEqual(tbody.children[0].children[0].innerHTML, '1');
+  strictEqual(tbody.children[0].children[1].innerHTML, '3');
+  strictEqual(tbody.children[1].children[0].innerHTML, '2');
+  strictEqual(tbody.children[1].children[1].innerHTML, '4');
+});
+test('Custom renderer', function() {
+  //Given: an empty dable, and some data for our Dable
+  var dable = new Dable();
+  var data = [[1, 2], [3, 4]];
+  var columns = ['Odd', 'Even'];
+  dable.SetDataAsRows(data);
+  dable.SetColumnNames(columns);
+  dable.columnData[0].CustomRendering = function(cellValue) {
+    return '<span class="bob">' +
+      cellValue.toString() + '</span>';
+  };
+
+  //When: we build the Dable
+  dable.BuildAll(testDiv.id);
+
+  //Then: we see the elements we expect
+  //Element pattern
+  var firstCell = testDiv.querySelector('td');
+  strictEqual(firstCell.innerHTML, '<span class="bob">1</span>');
 });
