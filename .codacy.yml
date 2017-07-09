@@ -1,5 +1,4 @@
 ---
 exclude_paths:
-  - coverage/
   - lib/
   - test/third_party/
