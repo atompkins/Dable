@@ -1,4 +1,5 @@
 ---
 exclude_paths:
   - lib/
+  - lib/**/*
   - test/third_party/
