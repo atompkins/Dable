@@ -1834,21 +1834,21 @@ test('Dable multi page Pager with style="JqueryUI" looks right', function() {
   strictEqual(pager.children[1].children[0].className,
     'ui-icon ui-icon-circle-arrow-w');
   strictEqual(pager.children[2].className,
-  'fg-button ui-button ui-state-default ui-corner-left table-page');
+    'fg-button ui-button ui-state-default ui-corner-left table-page');
   strictEqual(pager.children[3].className,
-  'fg-button ui-button ui-state-default ui-corner-left table-page');
+    'fg-button ui-button ui-state-default ui-corner-left table-page');
   strictEqual(pager.children[4].className,
-  'fg-button ui-button ui-state-default ui-corner-left table-page');
+    'fg-button ui-button ui-state-default ui-corner-left table-page');
   strictEqual(pager.children[5].className,
-  'fg-button ui-button ui-state-default ui-corner-left table-page');
+    'fg-button ui-button ui-state-default ui-corner-left table-page');
   strictEqual(pager.children[6].className,
-  'fg-button ui-button ui-state-default ui-corner-left table-page');
+    'fg-button ui-button ui-state-default ui-corner-left table-page');
   strictEqual(pager.children[7].className,
-  'fg-button ui-button ui-state-default ui-corner-left table-page');
+    'fg-button ui-button ui-state-default ui-corner-left table-page');
   strictEqual(pager.children[7].children[0].className,
     'ui-icon ui-icon-circle-arrow-e');
   strictEqual(pager.children[8].className,
-  'fg-button ui-button ui-state-default ui-corner-left table-page');
+    'fg-button ui-button ui-state-default ui-corner-left table-page');
   strictEqual(pager.children[8].children[0].className,
     'ui-icon ui-icon-arrowthickstop-1-e');
 });
@@ -1967,22 +1967,22 @@ test('Dable multi page Pager with style="JqueryUI" Last page looks right',
     strictEqual(pager.children[1].children[0].className,
       'ui-icon ui-icon-circle-arrow-w');
     strictEqual(pager.children[2].className,
-    'fg-button ui-button ui-state-default ui-corner-left table-page');
+      'fg-button ui-button ui-state-default ui-corner-left table-page');
     strictEqual(pager.children[3].className,
-    'fg-button ui-button ui-state-default ui-corner-left table-page');
+      'fg-button ui-button ui-state-default ui-corner-left table-page');
     strictEqual(pager.children[4].className,
-    'fg-button ui-button ui-state-default ui-corner-left table-page');
+      'fg-button ui-button ui-state-default ui-corner-left table-page');
     strictEqual(pager.children[5].className,
-    'fg-button ui-button ui-state-default ui-corner-left table-page');
+      'fg-button ui-button ui-state-default ui-corner-left table-page');
     strictEqual(pager.children[6].className,
-    'fg-button ui-button ui-state-default ui-corner-left table-page');
+      'fg-button ui-button ui-state-default ui-corner-left table-page');
     strictEqual(pager.children[7].className,
-    'fg-button ui-button ui-state-default ' +
-    'ui-corner-left table-page ui-state-disabled');
+      'fg-button ui-button ui-state-default ' +
+      'ui-corner-left table-page ui-state-disabled');
     strictEqual(pager.children[7].children[0].className,
       'ui-icon ui-icon-circle-arrow-e');
     strictEqual(pager.children[8].className,
-    'fg-button ui-button ui-state-default ui-corner-left table-page');
+      'fg-button ui-button ui-state-default ui-corner-left table-page');
     strictEqual(pager.children[8].children[0].className,
       'ui-icon ui-icon-arrowthickstop-1-e');
   }
@@ -2241,9 +2241,10 @@ test('Preselected Page Size Populates in the UI', function() {
   //Then: the dropdown value equals the selected page size
   var header = document.getElementById(testDiv.id + '_header');
   var pageSizeDropDown = header.querySelector('select');
-  strictEqual(Number(
-    pageSizeDropDown.options[pageSizeDropDown.selectedIndex].value),
-    selectedPageSize);
+  strictEqual(
+    Number(pageSizeDropDown.options[pageSizeDropDown.selectedIndex].value),
+    selectedPageSize
+  );
 });
 test('Changing the page size looks ok', function() {
   //Given: a dable
@@ -2260,9 +2261,10 @@ test('Changing the page size looks ok', function() {
   //Then: the dropdown value equals the selected page size
   var header = document.getElementById(testDiv.id + '_header');
   var pageSizeDropDown = header.querySelector('select');
-  strictEqual(Number(
-    pageSizeDropDown.options[pageSizeDropDown.selectedIndex].value),
-    selectedPageSize);
+  strictEqual(
+    Number(pageSizeDropDown.options[pageSizeDropDown.selectedIndex].value),
+    selectedPageSize
+  );
   var footer = testDiv.children[2];
   var indx = footer.children[0].children[0].innerText
     .indexOf('Showing 1 to 20 of 20 entries');

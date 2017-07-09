@@ -30,7 +30,7 @@ function makePageLeft() {
   pageLeft.id = this.id + '_page_prev';
   if (this.pageNumber <= 0) {
     pageLeft.setAttribute('disabled', 'disabled');
-    pageLeft.onclick = noop;  //disable onclick
+    pageLeft.onclick = noop; //disable onclick
   } else {
     pageLeft.onclick = bind(this.PreviousPage, this);
   }
@@ -64,7 +64,7 @@ function makePageLast() {
   pageLast.id = this.id + '_page_last';
   if (this.NumberOfPages() - 1 == this.pageNumber) {
     pageLast.setAttribute('disabled', 'disabled');
-    pageLast.onclick = noop;  //disable onclick
+    pageLast.onclick = noop; //disable onclick
   } else {
     pageLast.onclick = bind(this.LastPage, this);
   }

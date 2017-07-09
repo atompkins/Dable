@@ -21,11 +21,11 @@ export default {
   asyncStart: 0,
   asyncLength: 1000,
   tfoothtml: '',
-    //Basic Styling
+  //Basic Styling
   style: 'none',
   evenRowColor: '#E2E4FF',
   oddRowColor: 'white',
-    //Classes
+  //Classes
   dableClass: '',
   headerClass: '',
   tableClass: '',

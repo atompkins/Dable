@@ -18,7 +18,7 @@ export default {
   banner: banner,
   entry: 'src/dable.js',
   legacy: true,
-  moduleId: 'Dable',
+  amd: {id: 'Dable'},
   moduleName: 'Dable',
   plugins: plugins,
   targets: [

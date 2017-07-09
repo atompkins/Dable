@@ -21,15 +21,13 @@ export function bind(fn, thisArg) {
 
 export function doSort(dable) {
   return function() {
-    dable.sortFunc(this); // use this here, as the event.srcElement
-                          // is probably a <span>
+    dable.sortFunc(this); // use this here, as the event.srcElement is probably a <span>
   };
 }
 
 export function doSearch(dable) {
   return function() {
-    dable.searchFunc(this); // use this here, as the event.srcElement
-                            // is probably a <span>
+    dable.searchFunc(this); // use this here, as the event.srcElement is probably a <span>
   };
 }
 

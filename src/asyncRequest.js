@@ -45,7 +45,7 @@ export default function(start, filter, sortColumn, ascending, callback) { //call
 
       actualRows.reverse();
       for (var j = start + dable.asyncLength;
-          j < actualData.includedRowCount; ++j) {
+        j < actualData.includedRowCount; ++j) {
         actualRows.push([]);
       }
 
